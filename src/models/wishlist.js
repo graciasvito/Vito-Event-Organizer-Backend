@@ -1,23 +1,11 @@
 const supabase = require("../config/supabase");
 
 module.exports = {
-  showGreetings: () => new Promise((resolve, reject) => {}),
-  getAllUser: () =>
+  getAllWishlist: () =>
     new Promise((resolve, reject) => {
       supabase
-        .from("user")
+        .from("wishlist")
         .select("*")
-        .then((result) => {
-          console.log(result);
-        });
-    }),
-  getUserById: (userId) =>
-    new Promise((resolve, reject) => {
-      // SELECT * FROM product WHERE id = "123"
-      supabase
-        .from("user")
-        .select("*")
-        .eq("userId", userId)
         .then((result) => {
           if (!result.error) {
             resolve(result);
@@ -26,10 +14,11 @@ module.exports = {
           }
         });
     }),
-  createUser: (data) =>
+
+  createWishlist: (data) =>
     new Promise((resolve, reject) => {
       supabase
-        .from("user")
+        .from("wishlist")
         .insert([data])
         .then((result) => {
           if (!result.error) {

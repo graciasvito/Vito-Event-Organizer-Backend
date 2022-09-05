@@ -43,4 +43,18 @@ module.exports = {
           }
         });
     }),
+  updateEvent: (eventId, data) =>
+    new Promise((resolve, reject) => {
+      supabase
+        .from("event")
+        .update(data)
+        .eq("eventId", eventId)
+        .then((result) => {
+          if (!result.error) {
+            resolve(result);
+          } else {
+            reject(result);
+          }
+        });
+    }),
 };

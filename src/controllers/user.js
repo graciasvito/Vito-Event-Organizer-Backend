@@ -72,10 +72,25 @@ module.exports = {
   createUser: async (request, response) => {
     try {
       console.log(request.body);
-      const { name, price } = request.body;
+      const {
+        name,
+        username,
+        gender,
+        profession,
+        nationality,
+        dateOfBirth,
+        email,
+        password,
+      } = request.body;
       const setData = {
         name,
-        price,
+        username,
+        gender,
+        profession,
+        nationality,
+        dateOfBirth,
+        email,
+        password,
       };
 
       const result = await userModel.createUser(setData);
