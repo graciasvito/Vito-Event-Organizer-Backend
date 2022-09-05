@@ -1,11 +1,10 @@
 const { request } = require("express");
-const productModel = require("../models/product");
+const userModel = require("../models/user");
 const wrapper = require("../utils/wrapper");
 
 module.exports = {
   showGreetings: async (request, response) => {
     try {
-      // return response.status(200).send("Hello World!");
       return wrapper.response(
         response,
         200,
@@ -21,10 +20,10 @@ module.exports = {
       return wrapper.response(response, status, statusText, errorData);
     }
   },
-  getAllProduct: async (request, response) => {
+  getAllUser: async (request, response) => {
     try {
       console.log(request.query);
-      const result = await productModel.getAllProduct();
+      const result = await userModel.getAllUser();
       return wrapper.response(
         response,
         result.status,
@@ -40,22 +39,17 @@ module.exports = {
       return wrapper.response(response, status, statusText, errorData);
     }
   },
-  getProductById: async (request, response) => {
+  getUserById: async (request, response) => {
     try {
-      // const request = {
-      //   // ...
-      //   params: { id: "12345678" },
-      //   // ...
-      // };
-      const { id } = request.params;
+      const { userId } = request.params;
 
-      const result = await productModel.getProductById(id);
+      const result = await userModel.getUserById(userId);
 
       if (result.data.length < 1) {
         return wrapper.response(
           response,
           404,
-          `Data By Id ${id} Not Found`,
+          `Data By Id ${userId} Not Found`,
           []
         );
       }
@@ -75,7 +69,7 @@ module.exports = {
       return wrapper.response(response, status, statusText, errorData);
     }
   },
-  createProduct: async (request, response) => {
+  createUser: async (request, response) => {
     try {
       console.log(request.body);
       const { name, price } = request.body;
@@ -84,7 +78,7 @@ module.exports = {
         price,
       };
 
-      const result = await productModel.createProduct(setData);
+      const result = await userModel.createUser(setData);
 
       return wrapper.response(
         response,
@@ -102,7 +96,3 @@ module.exports = {
     }
   },
 };
-
-// request.query = bisa digunakan untuk fitur paginasi, sort,search di method get
-// request.params = bisa digunakan untuk fitur getdatabyid, updatedata, deletedata
-// request.body = bsa digunakan untuk fitur create/update
