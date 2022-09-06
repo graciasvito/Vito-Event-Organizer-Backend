@@ -160,14 +160,25 @@ module.exports = {
   },
   deleteProduct: async (request, response) => {
     try {
-      // 1. ngecek apakah idnya itu ada atau tidak ?
-      // 1.a. jika tidak ada maka akan mengembalikan id tidak ada di database
-      // 1.b. jika ada maka akan menjalankan proses delete
+      const { id } = request.params;
+
+      const checkId = await productModel.getProductById(id);
+
+      if (checkId.data.length < 1) {
+        return wrapper.response(
+          response,
+          404,
+          `Data By Id ${id} Not Found`,
+          []
+        );
+      }
+      const result = await productModel.deleteProduct(id);
+
       return wrapper.response(
         response,
-        200,
-        "Success Get Greetings",
-        "Hello World !"
+        result.status,
+        "Success Delete Data",
+        result.data
       );
     } catch (error) {
       const {
@@ -177,6 +188,10 @@ module.exports = {
       } = error;
       return wrapper.response(response, status, statusText, errorData);
     }
+
+    // 1. ngecek apakah idnya itu ada atau tidak ?
+    // 1.a. jika tidak ada maka akan mengembalikan id tidak ada di database
+    // 1.b. jika ada maka akan menjalankan proses delete
   },
 };
 

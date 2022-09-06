@@ -79,4 +79,18 @@ module.exports = {
           }
         });
     }),
+  deleteProduct: (id, data) =>
+    new Promise((resolve, reject) => {
+      supabase
+        .from("product")
+        .delete(data)
+        .eq("id", id)
+        .then((result) => {
+          if (!result.error) {
+            resolve(result);
+          } else {
+            reject(result);
+          }
+        });
+    }),
 };

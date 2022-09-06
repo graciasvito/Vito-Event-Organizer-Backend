@@ -1,7 +1,6 @@
 const supabase = require("../config/supabase");
 
 module.exports = {
-  showGreetings: () => new Promise((resolve, reject) => {}),
   getAllUser: () =>
     new Promise((resolve, reject) => {
       supabase
@@ -31,6 +30,34 @@ module.exports = {
       supabase
         .from("user")
         .insert([data])
+        .then((result) => {
+          if (!result.error) {
+            resolve(result);
+          } else {
+            reject(result);
+          }
+        });
+    }),
+  updateUser: (userId, data) =>
+    new Promise((resolve, reject) => {
+      supabase
+        .from("user")
+        .update(data)
+        .eq("userId", userId)
+        .then((result) => {
+          if (!result.error) {
+            resolve(result);
+          } else {
+            reject(result);
+          }
+        });
+    }),
+  deleteUser: (userId, data) =>
+    new Promise((resolve, reject) => {
+      supabase
+        .from("user")
+        .delete(data)
+        .eq("userId", userId)
         .then((result) => {
           if (!result.error) {
             resolve(result);

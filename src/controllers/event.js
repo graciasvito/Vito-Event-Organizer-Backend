@@ -98,7 +98,7 @@ module.exports = {
         return wrapper.response(
           response,
           404,
-          `Data By Id ${id} Not Found`,
+          `Data By Id ${eventId} Not Found`,
           []
         );
       }
@@ -129,16 +129,27 @@ module.exports = {
       return wrapper.response(response, status, statusText, errorData);
     }
   },
-  deleteProduct: async (request, response) => {
+  deleteEvent: async (request, response) => {
     try {
-      // 1. ngecek apakah idnya itu ada atau tidak ?
-      // 1.a. jika tidak ada maka akan mengembalikan id tidak ada di database
-      // 1.b. jika ada maka akan menjalankan proses delete
+      const { eventId } = request.params;
+
+      const checkId = await eventModel.getEventById(eventId);
+
+      if (checkId.data.length < 1) {
+        return wrapper.response(
+          response,
+          404,
+          `Data By Id ${eventId} Not Found`,
+          []
+        );
+      }
+      const result = await eventModel.deleteEvent(eventId);
+
       return wrapper.response(
         response,
-        200,
-        "Success Get Greetings",
-        "Hello World !"
+        result.status,
+        "Success Delete Data",
+        result.data
       );
     } catch (error) {
       const {
