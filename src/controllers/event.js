@@ -5,8 +5,7 @@ const wrapper = require("../utils/wrapper");
 module.exports = {
   getAllEvent: async (request, response) => {
     try {
-      console.log(request.query);
-      let { page, limit } = request.query;
+      let { page, limit, search } = request.query;
       page = +page;
       limit = +limit;
 
@@ -21,7 +20,7 @@ module.exports = {
       };
       const offset = page * limit - limit;
 
-      const result = await eventModel.getAllEvent(offset, limit);
+      const result = await eventModel.getAllEvent(offset, limit, search);
       return wrapper.response(
         response,
         result.status,

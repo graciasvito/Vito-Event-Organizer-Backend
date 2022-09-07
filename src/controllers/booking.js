@@ -33,10 +33,10 @@ module.exports = {
         const setBookingSection = {
           bookingId: resultBooking.data[0].bookingId,
           section: section[i],
-          // console.log(datawarna[0]);
           statusUsed: false,
         };
         // console.log(setBookingSection);
+        // eslint-disable-next-line no-await-in-loop
         const resultBookingSection = await bookingModel.createBookingSection(
           setBookingSection
         );

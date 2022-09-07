@@ -32,7 +32,7 @@ module.exports = {
       // SELECT * FROM product WHERE id = "123"
       supabase
         .from("booking")
-        .select("*")
+        .select("*, bookingSection(*)")
         .eq("userId", userId)
         .then((result) => {
           if (!result.error) {
