@@ -18,7 +18,7 @@ module.exports = {
     new Promise((resolve, reject) => {
       supabase
         .from("wishlist")
-        .select("*")
+        .select("*, event(*)")
         .then((result) => {
           if (!result.error) {
             resolve(result);

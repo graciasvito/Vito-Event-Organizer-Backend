@@ -41,7 +41,8 @@ module.exports = {
           setBookingSection
         );
       }
-      const result = { ...request.body };
+      const result = { ...resultBooking, ...request.body };
+      // console.log(result);
 
       return wrapper.response(
         response,
@@ -50,7 +51,7 @@ module.exports = {
         result.data
       );
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       const {
         status = 500,
         statusText = "Internal Server Error",

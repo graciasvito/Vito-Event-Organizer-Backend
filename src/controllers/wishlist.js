@@ -5,7 +5,7 @@ const wrapper = require("../utils/wrapper");
 module.exports = {
   getAllWishlist: async (request, response) => {
     try {
-      console.log(request.query);
+      // console.log(request.query);
       let { page, limit } = request.query;
       page = +page;
       limit = +limit;
@@ -30,7 +30,7 @@ module.exports = {
         pagination
       );
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       const {
         status = 500,
         statusText = "Internal Server Error",
@@ -41,7 +41,7 @@ module.exports = {
   },
   createWishlist: async (request, response) => {
     try {
-      console.log(request.body);
+      // console.log(request.body);
       const { eventId, userId } = request.body;
       const setData = {
         eventId,

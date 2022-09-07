@@ -20,8 +20,8 @@ module.exports = {
         .from("event")
         .select("*")
         .range(offset, offset + limit - 1)
-        .textSearch("name", search)
-        .order("name", { ascending: false })
+        .ilike("name", search)
+        .order("name", { ascending: true })
         .then((result) => {
           if (!result.error) {
             resolve(result);

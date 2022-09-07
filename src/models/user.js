@@ -7,7 +7,7 @@ module.exports = {
         .from("user")
         .select("*")
         .then((result) => {
-          console.log(result);
+          // console.log(result);
         });
     }),
   getUserById: (userId) =>

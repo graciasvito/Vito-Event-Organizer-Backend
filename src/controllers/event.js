@@ -8,6 +8,7 @@ module.exports = {
       let { page, limit, search } = request.query;
       page = +page;
       limit = +limit;
+      search = `%${search}%`;
 
       const totalData = await eventModel.getCountEvent();
       const totalPage = Math.ceil(totalData / limit);
@@ -29,7 +30,7 @@ module.exports = {
         pagination
       );
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       const {
         status = 500,
         statusText = "Internal Server Error",
@@ -70,7 +71,7 @@ module.exports = {
   },
   createEvent: async (request, response) => {
     try {
-      console.log(request.body);
+      // console.log(request.body);
       const { name, category, location, detail, dateTimeShow, price } =
         request.body;
       const setData = {
@@ -101,8 +102,8 @@ module.exports = {
   },
   updateEvent: async (request, response) => {
     try {
-      console.log(request.params);
-      console.log(request.body);
+      // console.log(request.params);
+      // console.log(request.body);
       const { eventId } = request.params;
       const { name, category, location, detail, dateTimeShow, price } =
         request.body;
