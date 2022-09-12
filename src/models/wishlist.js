@@ -18,7 +18,7 @@ module.exports = {
     new Promise((resolve, reject) => {
       supabase
         .from("wishlist")
-        .select("*, event(*)")
+        .select("*")
         .then((result) => {
           if (!result.error) {
             resolve(result);
@@ -45,7 +45,7 @@ module.exports = {
       // SELECT * FROM product WHERE id = "123"
       supabase
         .from("wishlist")
-        .select("*")
+        .select("*, event(*)")
         .eq("wishlistId", wishlistId)
         .then((result) => {
           if (!result.error) {

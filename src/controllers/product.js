@@ -1,5 +1,7 @@
 const productModel = require("../models/product");
 const wrapper = require("../utils/wrapper");
+const client = require("../config/redis");
+const cloudinary = require("../config/cloudinary");
 
 module.exports = {
   showGreetings: async (request, response) => {
@@ -22,8 +24,8 @@ module.exports = {
   },
   getAllProduct: async (request, response) => {
     try {
-      console.log(request.query);
-      let { page, limit } = request.query;
+      // console.log(request.query);
+      let { page, limit, search, sort, sortType } = request.query;
       page = +page;
       limit = +limit;
 
@@ -39,7 +41,20 @@ module.exports = {
 
       const offset = page * limit - limit;
 
+      // if (sortType.toLowerCase() === "asc") {
+      //   sortType = true;
+      // } else {
+      //   sortType = false;
+      // }
+
       const result = await productModel.getAllProduct(offset, limit);
+
+      client.setEx(
+        `getProduct:${JSON.stringify(request.query)}`,
+        3600,
+        JSON.stringify({ result: result.data, pagination })
+      );
+
       return wrapper.response(
         response,
         result.status,
@@ -48,7 +63,7 @@ module.exports = {
         pagination
       );
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       const {
         status = 500,
         statusText = "Internal Server Error",
@@ -77,6 +92,8 @@ module.exports = {
         );
       }
 
+      client.setEx(`getProduct:${id}`, 3600, JSON.stringify(result.data));
+
       return wrapper.response(
         response,
         result.status,
@@ -94,11 +111,14 @@ module.exports = {
   },
   createProduct: async (request, response) => {
     try {
-      console.log(request.body);
+      // console.log(request.body);
       const { name, price } = request.body;
+      const { filename, mimetype } = request.file;
+      // console.log(request.file);
       const setData = {
         name,
         price,
+        image: filename ? `${filename}.${mimetype.split("/")[1]}` : "",
       };
 
       const result = await productModel.createProduct(setData);
@@ -120,8 +140,8 @@ module.exports = {
   },
   updateProduct: async (request, response) => {
     try {
-      console.log(request.params);
-      console.log(request.body);
+      // console.log(request.params);
+      // console.log(request.body);
       const { id } = request.params;
       const { name, price } = request.body;
 
@@ -139,7 +159,18 @@ module.exports = {
       const setData = {
         name,
         price,
+        // updatedAt: ...
       };
+
+      // bikin proses untuk ngecek apakah semua property di dalam setData ada isinya ?
+      console.log(checkId.data[0].image);
+      // hilangkan ekstensi sebelum di masukan ke proses destroy
+      // cloudinary.uploader.destroy(
+      //   "Event-Organizing/Product/rbrskppupgixjqiz6kqm",
+      //   (result) => {
+      //     console.log(result);
+      //   }
+      // );
 
       const result = await productModel.updateProduct(id, setData);
 
@@ -160,25 +191,14 @@ module.exports = {
   },
   deleteProduct: async (request, response) => {
     try {
-      const { id } = request.params;
-
-      const checkId = await productModel.getProductById(id);
-
-      if (checkId.data.length < 1) {
-        return wrapper.response(
-          response,
-          404,
-          `Data By Id ${id} Not Found`,
-          []
-        );
-      }
-      const result = await productModel.deleteProduct(id);
-
+      // 1. ngecek apakah idnya itu ada atau tidak ?
+      // 1.a. jika tidak ada maka akan mengembalikan id tidak ada di database
+      // 1.b. jika ada maka akan menjalankan proses delete
       return wrapper.response(
         response,
-        result.status,
-        "Success Delete Data",
-        result.data
+        200,
+        "Success Get Greetings",
+        "Hello World !"
       );
     } catch (error) {
       const {
@@ -188,10 +208,6 @@ module.exports = {
       } = error;
       return wrapper.response(response, status, statusText, errorData);
     }
-
-    // 1. ngecek apakah idnya itu ada atau tidak ?
-    // 1.a. jika tidak ada maka akan mengembalikan id tidak ada di database
-    // 1.b. jika ada maka akan menjalankan proses delete
   },
 };
 

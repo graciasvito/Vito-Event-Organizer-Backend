@@ -107,7 +107,7 @@ module.exports = {
         return wrapper.response(
           response,
           404,
-          `Data By Id ${eventId} Not Found`,
+          `Data By Id ${userId} Not Found`,
           []
         );
       }
@@ -152,7 +152,7 @@ module.exports = {
           []
         );
       }
-      const result = await userModel.deleteEvent(userId);
+      const result = await userModel.deleteUser(userId);
 
       return wrapper.response(
         response,

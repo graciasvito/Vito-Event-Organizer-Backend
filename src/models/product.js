@@ -25,6 +25,7 @@ module.exports = {
         .from("product")
         .select("*")
         .range(offset, offset + limit - 1)
+        // input query tambahan untuk sort dan search
         .then((result) => {
           if (!result.error) {
             resolve(result);
@@ -42,7 +43,7 @@ module.exports = {
       // SELECT * FROM product WHERE id = "123"
       supabase
         .from("product")
-        .select("*")
+        .select(`*`)
         .eq("id", id)
         .then((result) => {
           if (!result.error) {
@@ -70,20 +71,6 @@ module.exports = {
       supabase
         .from("product")
         .update(data)
-        .eq("id", id)
-        .then((result) => {
-          if (!result.error) {
-            resolve(result);
-          } else {
-            reject(result);
-          }
-        });
-    }),
-  deleteProduct: (id, data) =>
-    new Promise((resolve, reject) => {
-      supabase
-        .from("product")
-        .delete(data)
         .eq("id", id)
         .then((result) => {
           if (!result.error) {

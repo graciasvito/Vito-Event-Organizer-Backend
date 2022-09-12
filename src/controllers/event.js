@@ -1,15 +1,15 @@
 const { request } = require("express");
 const eventModel = require("../models/event");
 const wrapper = require("../utils/wrapper");
+const cloudinary = require("../config/cloudinary");
 
 module.exports = {
   getAllEvent: async (request, response) => {
     try {
-      let { page, limit, search } = request.query;
-      page = +page;
-      limit = +limit;
-      search = `%${search}%`;
-
+      let { page, limit, searchName, searchDateTime } = request.query;
+      page = +page || 1;
+      limit = +limit || 10;
+      searchName = `%${searchName}%`;
       const totalData = await eventModel.getCountEvent();
       const totalPage = Math.ceil(totalData / limit);
       const pagination = {
@@ -21,7 +21,12 @@ module.exports = {
       };
       const offset = page * limit - limit;
 
-      const result = await eventModel.getAllEvent(offset, limit, search);
+      const result = await eventModel.getAllEvent(
+        offset,
+        limit,
+        searchName,
+        searchDateTime
+      );
       return wrapper.response(
         response,
         result.status,
