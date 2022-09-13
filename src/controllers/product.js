@@ -113,12 +113,12 @@ module.exports = {
     try {
       // console.log(request.body);
       const { name, price } = request.body;
-      const { filename, mimetype } = request.file;
-      // console.log(request.file);
+      const { filename } = request.file;
+      console.log(request.file);
       const setData = {
         name,
         price,
-        image: filename ? `${filename}.${mimetype.split("/")[1]}` : "",
+        image: filename || "",
       };
 
       const result = await productModel.createProduct(setData);

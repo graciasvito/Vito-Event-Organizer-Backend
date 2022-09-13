@@ -1,5 +1,6 @@
 const { request } = require("express");
 const userModel = require("../models/user");
+const { response } = require("../utils/wrapper");
 const wrapper = require("../utils/wrapper");
 
 module.exports = {
@@ -160,6 +161,41 @@ module.exports = {
         "Success Delete Data",
         result.data
       );
+    } catch (error) {
+      const {
+        status = 500,
+        statusText = "Internal Server Error",
+        error: errorData = null,
+      } = error;
+      return wrapper.response(response, status, statusText, errorData);
+    }
+  },
+  updateImageUser: async (request, response) => {
+    try {
+      const { userId } = request.params;
+      const { filename } = request.file;
+      const checkId = await userModel.getUserById(userId);
+
+      if (checkId.data.length < 1) {
+        return wrapper.response(
+          response,
+          404,
+          `Data By Id ${userId} Not Found`,
+          []
+        );
+      }
+
+      const setData = {
+        userId,
+        image: filename || "",
+      };
+
+      const result = await userModel.updateImageUser(userId, setData);
+      // console.log(data);
+      return wrapper.response(response, result.status, "Success Update Image", {
+        userId: setData.userId,
+        image: setData.image,
+      });
     } catch (error) {
       const {
         status = 500,

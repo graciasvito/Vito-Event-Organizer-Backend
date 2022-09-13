@@ -6,10 +6,10 @@ const cloudinary = require("../config/cloudinary");
 module.exports = {
   getAllEvent: async (request, response) => {
     try {
-      let { page, limit, searchName, searchDateTime } = request.query;
+      let { page, limit, sort } = request.query;
       page = +page || 1;
       limit = +limit || 10;
-      searchName = `%${searchName}%`;
+
       const totalData = await eventModel.getCountEvent();
       const totalPage = Math.ceil(totalData / limit);
       const pagination = {
@@ -20,12 +20,22 @@ module.exports = {
         totalData,
       };
       const offset = page * limit - limit;
+      const sortColumn = sort.split(" ")[0];
+      let sortType = sort.split(" ")[1];
+
+      if (sortType.toLowerCase() === "asc") {
+        sortType = true;
+      } else {
+        sortType = false;
+      }
+      console.log(sortColumn);
+      console.log(sortType);
 
       const result = await eventModel.getAllEvent(
         offset,
         limit,
-        searchName,
-        searchDateTime
+        sortColumn,
+        sortType
       );
       return wrapper.response(
         response,
@@ -182,3 +192,16 @@ module.exports = {
     }
   },
 };
+
+// const sortColumn = sort.split(" ")[0];
+// let sortType = sort.split(" ")[1];
+
+// if (sortType.toLowerCase() === "asc") {
+// sortType = true;
+// } else {
+// sortType = false
+// }
+/* const day = new Date("dari postman");
+const nextDay = new Date(new Date(day).setDate(day.getDate() + 1)); 
+default nya gimana yang search by dateTimeShow?
+datanya bakal ketampil semua */

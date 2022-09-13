@@ -1,7 +1,6 @@
 {
   "name": "event-organizing",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "start": "npx nodemon ./src/app.js"
@@ -34,5 +33,15 @@
     "eslint-plugin-prettier": "^4.2.1",
     "nodemon": "^2.0.19",
     "prettier": "^2.7.1"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/graciasvito/Vito-Event-Organizer-Backend.git"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/graciasvito/Vito-Event-Organizer-Backend/issues"
+  },
+  "homepage": "https://github.com/graciasvito/Vito-Event-Organizer-Backend#readme",
+  "description": ""
 }

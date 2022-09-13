@@ -3,6 +3,9 @@ const express = require("express");
 const Router = express.Router();
 
 const productController = require("../controllers/product");
+const authMiddleware = require("../middleware/auth");
+const uploadMiddleware = require("../middleware/uploadFile");
+// const redisMiddleware = require("../middleware/redis");
 
 // Router.get("/greetings", async (request, response) => {
 // try {
@@ -17,10 +20,33 @@ Router.get("/greetings", productController.showGreetings);
 // Path Read
 // Path Update
 // Path Delete
-Router.get("/", productController.getAllProduct);
-Router.get("/:id", productController.getProductById);
-Router.post("/", productController.createProduct);
-Router.patch("/:id", productController.updateProduct);
-Router.delete("/:id", productController.deleteProduct);
+Router.get(
+  "/",
+  authMiddleware.authentication,
+  authMiddleware.isAdmin,
+  // redisMiddleware.getAllProduct,
+  productController.getAllProduct
+);
+Router.get(
+  "/:id",
+  // redisMiddleware.getProductById,
+  productController.getProductById
+);
+Router.post(
+  "/",
+  uploadMiddleware.uploadProduct,
+  // redisMiddleware.clearProduct,
+  productController.createProduct
+);
+Router.patch(
+  "/:id",
+  // redisMiddleware.clearProduct,
+  productController.updateProduct
+);
+Router.delete(
+  "/:id",
+  // redisMiddleware.clearProduct,
+  productController.deleteProduct
+);
 
 module.exports = Router;

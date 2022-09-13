@@ -27,12 +27,20 @@ module.exports = {
   register: async (request, response) => {
     try {
       const { email, password } = request.body;
-
+      const checkEmail = await authModel.getUserByEmail(email);
       const hashedPassword = await bcrypt.hash(password, 10);
       const setData = {
         email,
         password: hashedPassword, // UNTUK PASSWORD BISA DI ENKRIPSI
       };
+      if (checkEmail.data.length > 0) {
+        return wrapper.response(
+          response,
+          400,
+          "Email is Already Registered",
+          null
+        );
+      }
       const result = await userModel.createUser(setData);
       // store hash in the database
       console.log(setData);
