@@ -76,7 +76,7 @@ module.exports = {
 
       // 2. PROSES PENCOCOKAN PASSWORD
       // if (password !== checkEmail.data[0].password) {
-      // return wrapper.response(response, 400, "Wrong Password", null);
+      // return wrpper.response(response, 400, "Wrong Password", null);
       // }
 
       // 3. PROSES PEMBUATAN TOKEN JWT

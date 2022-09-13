@@ -1,4 +1,5 @@
 const { request } = require("express");
+const bcrypt = require("bcrypt");
 const userModel = require("../models/user");
 const { response } = require("../utils/wrapper");
 const wrapper = require("../utils/wrapper");
@@ -196,6 +197,62 @@ module.exports = {
         userId: setData.userId,
         image: setData.image,
       });
+    } catch (error) {
+      const {
+        status = 500,
+        statusText = "Internal Server Error",
+        error: errorData = null,
+      } = error;
+      return wrapper.response(response, status, statusText, errorData);
+    }
+  },
+  updateUserPassword: async (request, response) => {
+    try {
+      // console.log(request.params);
+      // console.log(request.body);
+      const { userId } = request.params;
+      const { oldPassword, newPassword, confirmPassword } = request.body;
+
+      const checkId = await userModel.getUserById(userId);
+      // console.log(checkId);
+      if (checkId.data.length < 1) {
+        return wrapper.response(
+          response,
+          404,
+          `Data By Id ${userId} Not Found`,
+          []
+        );
+      }
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      if (newPassword !== confirmPassword) {
+        return wrapper.response(
+          response,
+          400,
+          "Please Confirm the Correct Password",
+          null
+        );
+      }
+      bcrypt.compare(oldPassword, checkId.data[0].password, (error, same) => {
+        if (same) {
+          return hashedPassword;
+        } // eslint-disable-next-line no-else-return
+        else {
+          // eslint-disable-next-line no-else-return
+          wrapper.response(response, 400, "Wrong Old Password", null);
+        }
+      });
+      const setData = {
+        password: hashedPassword,
+      };
+
+      const result = await userModel.updateUser(userId, setData);
+
+      return wrapper.response(
+        response,
+        result.status,
+        "Success Update Data",
+        result.data
+      );
     } catch (error) {
       const {
         status = 500,

@@ -15,5 +15,6 @@ Router.get("/:userId", userController.getAllUser);
 Router.post("/", userController.createUser);
 Router.patch("/:userId", userController.updateUser);
 Router.delete("/:userId", userController.deleteUser);
+Router.patch("/password/:userId", userController.updateUserPassword);
 
 module.exports = Router;
