@@ -1,14 +1,17 @@
 const { request } = require("express");
 const eventModel = require("../models/event");
 const wrapper = require("../utils/wrapper");
-const cloudinary = require("../config/cloudinary");
+// const cloudinary = require("../config/cloudinary");
+// const { search } = require("../config/cloudinary");
 
 module.exports = {
   getAllEvent: async (request, response) => {
     try {
-      let { page, limit, sort } = request.query;
+      let { page, limit, searchName, sort } = request.query;
       page = +page || 1;
       limit = +limit || 10;
+      searchName = `%${searchName}%` || "";
+      // // searchDateShow = "";
 
       const totalData = await eventModel.getCountEvent();
       const totalPage = Math.ceil(totalData / limit);
@@ -20,6 +23,8 @@ module.exports = {
         totalData,
       };
       const offset = page * limit - limit;
+      // const day = new Date(searchDateShow);
+      // const nextDay = new Date(new Date(day).setDate(day.getDate() + 1));
       const sortColumn = sort.split(" ")[0];
       let sortType = sort.split(" ")[1];
 
@@ -28,14 +33,15 @@ module.exports = {
       } else {
         sortType = false;
       }
-      console.log(sortColumn);
-      console.log(sortType);
 
       const result = await eventModel.getAllEvent(
         offset,
         limit,
+        searchName,
         sortColumn,
         sortType
+        // day,
+        // nextDay
       );
       return wrapper.response(
         response,
@@ -86,7 +92,9 @@ module.exports = {
   },
   createEvent: async (request, response) => {
     try {
+      // console.log(request.file);
       // console.log(request.body);
+      const { filename } = request.file;
       const { name, category, location, detail, dateTimeShow, price } =
         request.body;
       const setData = {
@@ -96,6 +104,7 @@ module.exports = {
         detail,
         dateTimeShow,
         price,
+        image: filename || "",
       };
 
       const result = await eventModel.createEvent(setData);
@@ -112,6 +121,7 @@ module.exports = {
         statusText = "Internal Server Error",
         error: errorData = null,
       } = error;
+
       return wrapper.response(response, status, statusText, errorData);
     }
   },

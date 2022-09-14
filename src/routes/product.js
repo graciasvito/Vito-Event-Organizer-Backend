@@ -33,7 +33,7 @@ Router.get(
   productController.getProductById
 );
 Router.post(
-  "/",
+  "/create",
   uploadMiddleware.uploadProduct,
   // redisMiddleware.clearProduct,
   productController.createProduct

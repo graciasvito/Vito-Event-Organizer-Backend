@@ -1,7 +1,8 @@
+const { request } = require("express");
 const productModel = require("../models/product");
 const wrapper = require("../utils/wrapper");
 const client = require("../config/redis");
-const cloudinary = require("../config/cloudinary");
+// const cloudinary = require("../config/cloudinary");
 
 module.exports = {
   showGreetings: async (request, response) => {
@@ -49,11 +50,11 @@ module.exports = {
 
       const result = await productModel.getAllProduct(offset, limit);
 
-      client.setEx(
-        `getProduct:${JSON.stringify(request.query)}`,
-        3600,
-        JSON.stringify({ result: result.data, pagination })
-      );
+      // client.setEx(
+      //   `getProduct:${JSON.stringify(request.query)}`,
+      //   3600,
+      //   JSON.stringify({ result: result.data, pagination })
+      // );
 
       return wrapper.response(
         response,
@@ -112,9 +113,10 @@ module.exports = {
   createProduct: async (request, response) => {
     try {
       // console.log(request.body);
-      const { name, price } = request.body;
       const { filename } = request.file;
-      console.log(request.file);
+      const { name, price } = request.body;
+
+      // console.log(request.file);
       const setData = {
         name,
         price,

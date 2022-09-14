@@ -1,8 +1,9 @@
 const { request } = require("express");
 const bcrypt = require("bcrypt");
 const userModel = require("../models/user");
-const { response } = require("../utils/wrapper");
+// const { response } = require("../utils/wrapper");
 const wrapper = require("../utils/wrapper");
+const cloudinary = require("../config/cloudinary");
 
 module.exports = {
   getAllUser: async (request, response) => {
@@ -124,7 +125,7 @@ module.exports = {
       };
 
       const result = await userModel.updateUser(userId, setData);
-
+      delete result.data.email;
       return wrapper.response(
         response,
         result.status,
@@ -173,6 +174,7 @@ module.exports = {
   },
   updateImageUser: async (request, response) => {
     try {
+      // console.log(request.file);
       const { userId } = request.params;
       const { filename } = request.file;
       const checkId = await userModel.getUserById(userId);
@@ -187,14 +189,13 @@ module.exports = {
       }
 
       const setData = {
-        userId,
         image: filename || "",
       };
 
       const result = await userModel.updateImageUser(userId, setData);
       // console.log(data);
       return wrapper.response(response, result.status, "Success Update Image", {
-        userId: setData.userId,
+        userId,
         image: setData.image,
       });
     } catch (error) {
@@ -203,6 +204,7 @@ module.exports = {
         statusText = "Internal Server Error",
         error: errorData = null,
       } = error;
+      console.log(error);
       return wrapper.response(response, status, statusText, errorData);
     }
   },
@@ -242,17 +244,14 @@ module.exports = {
         }
       });
       const setData = {
-        password: hashedPassword,
+        userId,
       };
 
       const result = await userModel.updateUser(userId, setData);
 
-      return wrapper.response(
-        response,
-        result.status,
-        "Success Update Data",
-        result.data
-      );
+      return wrapper.response(response, result.status, "Success Update Data", {
+        userId: setData.userId,
+      });
     } catch (error) {
       const {
         status = 500,

@@ -14,13 +14,21 @@ module.exports = {
           }
         });
     }),
-  getAllEvent: (offset, limit, searchName, sortColumn, sortType) =>
+  getAllEvent: (
+    offset,
+    limit,
+    searchName,
+    sortColumn,
+    sortType
+    // day,
+    // nextDay
+  ) =>
     new Promise((resolve, reject) => {
       supabase
         .from("event")
         .select("*")
         .range(offset, offset + limit - 1)
-        // .ilike("name", searchName)
+        .ilike("name", searchName)
         .order(sortColumn, { ascending: sortType })
         // .gt("dateTimeShow", `${day.toISOString()}`)
         // .lt("dateTimeShow", `${nextDay.toISOString()}`)

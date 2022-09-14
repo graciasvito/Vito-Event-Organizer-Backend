@@ -26,12 +26,14 @@ module.exports = {
   },
   register: async (request, response) => {
     try {
-      const { email, password } = request.body;
+      const { username, email, password } = request.body;
       const checkEmail = await authModel.getUserByEmail(email);
       const hashedPassword = await bcrypt.hash(password, 10);
       const setData = {
+        username,
         email,
         password: hashedPassword, // UNTUK PASSWORD BISA DI ENKRIPSI
+        role: "user",
       };
       if (checkEmail.data.length > 0) {
         return wrapper.response(
@@ -43,13 +45,10 @@ module.exports = {
       }
       const result = await userModel.createUser(setData);
       // store hash in the database
-      console.log(setData);
-      return wrapper.response(
-        response,
-        result.status,
-        "Success Create Data",
-        result.data
-      );
+      // console.log(setData);
+      return wrapper.response(response, result.status, "Success Create Data", {
+        userId: result.data[0].userId,
+      });
     } catch (error) {
       const {
         status = 500,
