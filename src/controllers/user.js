@@ -176,9 +176,7 @@ module.exports = {
     try {
       // console.log(request.file);
       const { userId } = request.params;
-      const { filename } = request.file;
       const checkId = await userModel.getUserById(userId);
-
       if (checkId.data.length < 1) {
         return wrapper.response(
           response,
@@ -187,11 +185,10 @@ module.exports = {
           []
         );
       }
-
+      const { filename } = request.file;
       const setData = {
         image: filename || "",
       };
-
       const result = await userModel.updateImageUser(userId, setData);
       // console.log(data);
       return wrapper.response(response, result.status, "Success Update Image", {
@@ -204,7 +201,7 @@ module.exports = {
         statusText = "Internal Server Error",
         error: errorData = null,
       } = error;
-      console.log(error);
+      // console.log(error);
       return wrapper.response(response, status, statusText, errorData);
     }
   },
