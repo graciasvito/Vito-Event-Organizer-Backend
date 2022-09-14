@@ -101,8 +101,15 @@ module.exports = {
       // console.log(request.params);
       // console.log(request.body);
       const { userId } = request.params;
-      const { name, username, gender, profession, nationality, dateOfBirth } =
-        request.body;
+      const {
+        name,
+        username,
+        gender,
+        profession,
+        nationality,
+        dateOfBirth,
+        role,
+      } = request.body;
 
       const checkId = await userModel.getUserById(userId);
 
@@ -114,7 +121,8 @@ module.exports = {
           []
         );
       }
-
+      const today = new Date().toISOString();
+      console.log(today);
       const setData = {
         name,
         username,
@@ -122,6 +130,8 @@ module.exports = {
         profession,
         nationality,
         dateOfBirth,
+        role,
+        updatedAt: today,
       };
 
       const result = await userModel.updateUser(userId, setData);

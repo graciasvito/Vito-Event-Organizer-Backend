@@ -115,8 +115,9 @@ module.exports = {
   logout: async (request, response) => {
     try {
       let token = request.headers.authorization;
+      console.log(token);
       token = token.split(" ")[1];
-      client.setEx(`accessToken:${token}`, 3600 * 48, token);
+      client.setEx(`accessToken:${token}`, 3600 * 24, token);
       return wrapper.response(response, 200, "Success Logout", null);
     } catch (error) {
       const {
