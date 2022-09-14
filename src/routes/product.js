@@ -5,7 +5,7 @@ const Router = express.Router();
 const productController = require("../controllers/product");
 const authMiddleware = require("../middleware/auth");
 const uploadMiddleware = require("../middleware/uploadFile");
-// const redisMiddleware = require("../middleware/redis");
+const redisMiddleware = require("../middleware/redis");
 
 // Router.get("/greetings", async (request, response) => {
 // try {
@@ -24,28 +24,28 @@ Router.get(
   "/",
   authMiddleware.authentication,
   authMiddleware.isAdmin,
-  // redisMiddleware.getAllProduct,
+  redisMiddleware.getAllProduct,
   productController.getAllProduct
 );
 Router.get(
   "/:id",
-  // redisMiddleware.getProductById,
+  redisMiddleware.getProductById,
   productController.getProductById
 );
 Router.post(
   "/create",
   uploadMiddleware.uploadProduct,
-  // redisMiddleware.clearProduct,
+  redisMiddleware.clearProduct,
   productController.createProduct
 );
 Router.patch(
   "/:id",
-  // redisMiddleware.clearProduct,
+  redisMiddleware.clearProduct,
   productController.updateProduct
 );
 Router.delete(
   "/:id",
-  // redisMiddleware.clearProduct,
+  redisMiddleware.clearProduct,
   productController.deleteProduct
 );
 

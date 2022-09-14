@@ -1,6 +1,7 @@
 const { request } = require("express");
 const eventModel = require("../models/event");
 const wrapper = require("../utils/wrapper");
+const client = require("../config/redis");
 // const cloudinary = require("../config/cloudinary");
 // const { search } = require("../config/cloudinary");
 
@@ -43,6 +44,11 @@ module.exports = {
         // day,
         // nextDay
       );
+      client.setEx(
+        `getEvent:${JSON.stringify(request.query)}`,
+        3600,
+        JSON.stringify({ result: result.data, pagination })
+      );
       return wrapper.response(
         response,
         result.status,
@@ -74,6 +80,7 @@ module.exports = {
           []
         );
       }
+      client.setEx(`getEvent:${eventId}`, 3600, JSON.stringify(result.data));
 
       return wrapper.response(
         response,

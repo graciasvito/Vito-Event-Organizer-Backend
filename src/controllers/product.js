@@ -50,11 +50,11 @@ module.exports = {
 
       const result = await productModel.getAllProduct(offset, limit);
 
-      // client.setEx(
-      //   `getProduct:${JSON.stringify(request.query)}`,
-      //   3600,
-      //   JSON.stringify({ result: result.data, pagination })
-      // );
+      client.setEx(
+        `getProduct:${JSON.stringify(request.query)}`,
+        3600,
+        JSON.stringify({ result: result.data, pagination })
+      );
 
       return wrapper.response(
         response,

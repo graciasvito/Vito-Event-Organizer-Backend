@@ -47,8 +47,10 @@ module.exports = {
   isAdmin: async (request, response, next) => {
     try {
       // PROSES UNTUK PENGECEKAN ROLE
-      // console.log(request.decodeToken);
-      next();
+      if (request.decodeToken.role === "user") {
+        next();
+      }
+      console.log(request.decodeToken);
     } catch (error) {
       console.log(error);
     }
