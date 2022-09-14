@@ -25,6 +25,7 @@ Router.patch(
   "/:eventId",
   authMiddleware.authentication,
   authMiddleware.isAdmin,
+  uploadMiddleware.updateImageEvent,
   redisMiddleware.clearEvent,
   eventController.updateEvent
 );

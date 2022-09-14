@@ -2,7 +2,7 @@ const { request } = require("express");
 const eventModel = require("../models/event");
 const wrapper = require("../utils/wrapper");
 const client = require("../config/redis");
-// const cloudinary = require("../config/cloudinary");
+const cloudinary = require("../config/cloudinary");
 // const { search } = require("../config/cloudinary");
 
 module.exports = {
@@ -142,11 +142,12 @@ module.exports = {
       // console.log(request.params);
       // console.log(request.body);
       const { eventId } = request.params;
+      const { filename } = request.file;
       const { name, category, location, detail, dateTimeShow, price } =
         request.body;
 
       const checkId = await eventModel.getEventById(eventId);
-
+      console.log(checkId);
       if (checkId.data.length < 1) {
         return wrapper.response(
           response,
@@ -155,7 +156,7 @@ module.exports = {
           []
         );
       }
-
+      const today = new Date().toISOString();
       const setData = {
         name,
         category,
@@ -163,7 +164,12 @@ module.exports = {
         detail,
         dateTimeShow,
         price,
+        image: filename || "",
+        updatedAt: today,
       };
+      cloudinary.uploader.destroy(checkId.data[0].image, (result) => {
+        console.log(result);
+      });
 
       const result = await eventModel.updateEvent(eventId, setData);
 
@@ -196,6 +202,9 @@ module.exports = {
           []
         );
       }
+      cloudinary.uploader.destroy(checkId.data[0].image, (result) => {
+        console.log(result);
+      });
       const result = await eventModel.deleteEvent(eventId);
 
       return wrapper.response(

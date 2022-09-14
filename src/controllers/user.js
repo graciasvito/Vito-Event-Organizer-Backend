@@ -201,6 +201,9 @@ module.exports = {
         image: filename || "",
         updatedAt: today,
       };
+      cloudinary.uploader.destroy(checkId.data[0].image, (result) => {
+        console.log(result);
+      });
       const result = await userModel.updateImageUser(userId, setData);
       // console.log(data);
       return wrapper.response(response, result.status, "Success Update Image", {

@@ -36,7 +36,17 @@ module.exports = {
       },
     });
 
-    const upload = multer({ storage }).single("image");
+    const upload = multer({
+      storage,
+      // limits: { fileSize: 512000 },
+      fileFilter(req, file, callback) {
+        const ext = file.mimetype.split("/")[1];
+        if (ext !== "png" && ext !== "jpg" && ext !== "gif" && ext !== "jpeg") {
+          return callback(new Error("Only images are allowed"));
+        }
+        callback(null, req);
+      },
+    }).single("image");
 
     upload(request, response, (err) => {
       if (err instanceof multer.MulterError) {

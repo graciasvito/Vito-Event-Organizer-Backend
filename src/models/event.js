@@ -84,7 +84,7 @@ module.exports = {
     new Promise((resolve, reject) => {
       supabase
         .from("event")
-        .update(data)
+        .update([data])
         .eq("eventId", eventId)
         .then((result) => {
           if (!result.error) {
