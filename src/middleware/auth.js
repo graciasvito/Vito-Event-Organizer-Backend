@@ -47,10 +47,13 @@ module.exports = {
   isAdmin: async (request, response, next) => {
     try {
       // PROSES UNTUK PENGECEKAN ROLE
-      if (request.decodeToken.role === "user") {
-        next();
+      const result = request.decodeToken;
+      if (result.role === "user") {
+        return wrapper.response(response, 403, "You're Not Admin", null);
       }
-      console.log(request.decodeToken);
+      return next();
+
+      // console.log(request.decodeToken);
     } catch (error) {
       console.log(error);
     }

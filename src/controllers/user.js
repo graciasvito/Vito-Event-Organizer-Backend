@@ -135,7 +135,7 @@ module.exports = {
       };
 
       const result = await userModel.updateUser(userId, setData);
-      delete result.data.email;
+      delete result.data[0].password;
       return wrapper.response(
         response,
         result.status,
@@ -184,7 +184,7 @@ module.exports = {
   },
   updateImageUser: async (request, response) => {
     try {
-      // console.log(request.file);
+      console.log(request.file);
       const { userId } = request.params;
       const checkId = await userModel.getUserById(userId);
       if (checkId.data.length < 1) {
@@ -196,8 +196,10 @@ module.exports = {
         );
       }
       const { filename } = request.file;
+      const today = new Date().toISOString();
       const setData = {
         image: filename || "",
+        updatedAt: today,
       };
       const result = await userModel.updateImageUser(userId, setData);
       // console.log(data);

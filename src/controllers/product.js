@@ -146,42 +146,43 @@ module.exports = {
       // console.log(request.body);
       const { id } = request.params;
       const { name, price } = request.body;
+      console.log(request.file);
 
-      const checkId = await productModel.getProductById(id);
+      // const checkId = await productModel.getProductById(id);
 
-      if (checkId.data.length < 1) {
-        return wrapper.response(
-          response,
-          404,
-          `Data By Id ${id} Not Found`,
-          []
-        );
-      }
+      // if (checkId.data.length < 1) {
+      //   return wrapper.response(
+      //     response,
+      //     404,
+      //     `Data By Id ${id} Not Found`,
+      //     []
+      //   );
+      // }
 
-      const setData = {
-        name,
-        price,
-        // updatedAt: ...
-      };
+      // const setData = {
+      //   name,
+      //   price,
+      //   // updatedAt: ...
+      // };
 
-      // bikin proses untuk ngecek apakah semua property di dalam setData ada isinya ?
-      console.log(checkId.data[0].image);
-      // hilangkan ekstensi sebelum di masukan ke proses destroy
-      // cloudinary.uploader.destroy(
-      //   "Event-Organizing/Product/rbrskppupgixjqiz6kqm",
-      //   (result) => {
-      //     console.log(result);
-      //   }
+      // // bikin proses untuk ngecek apakah semua property di dalam setData ada isinya ?
+      // console.log(checkId.data[0].image);
+      // // hilangkan ekstensi sebelum di masukan ke proses destroy
+      // // cloudinary.uploader.destroy(
+      // //   "Event-Organizing/Product/rbrskppupgixjqiz6kqm",
+      // //   (result) => {
+      // //     console.log(result);
+      // //   }
+      // // );
+
+      // const result = await productModel.updateProduct(id, setData);
+
+      // return wrapper.response(
+      //   response,
+      //   result.status,
+      //   "Success Update Data",
+      //   result.data
       // );
-
-      const result = await productModel.updateProduct(id, setData);
-
-      return wrapper.response(
-        response,
-        result.status,
-        "Success Update Data",
-        result.data
-      );
     } catch (error) {
       const {
         status = 500,

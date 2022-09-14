@@ -19,26 +19,37 @@ module.exports = {
     limit,
     searchName,
     sortColumn,
-    sortType
-    // day,
-    // nextDay
+    sortType,
+    day,
+    nextDay
   ) =>
     new Promise((resolve, reject) => {
-      supabase
+      const query = supabase
         .from("event")
         .select("*")
         .range(offset, offset + limit - 1)
         .ilike("name", searchName)
-        .order(sortColumn, { ascending: sortType })
-        // .gt("dateTimeShow", `${day.toISOString()}`)
-        // .lt("dateTimeShow", `${nextDay.toISOString()}`)
-        .then((result) => {
+        .order(sortColumn, { ascending: sortType });
+      if (day) {
+        query
+          .gt("dateTimeShow", `${day.toISOString()}`)
+          .lt("dateTimeShow", `${nextDay.toISOString()}`)
+          .then((result) => {
+            if (!result.error) {
+              resolve(result);
+            } else {
+              reject(result);
+            }
+          });
+      } else {
+        query.then((result) => {
           if (!result.error) {
             resolve(result);
           } else {
             reject(result);
           }
         });
+      }
     }),
 
   getEventById: (eventId) =>

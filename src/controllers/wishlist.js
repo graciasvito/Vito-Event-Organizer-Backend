@@ -137,4 +137,34 @@ module.exports = {
       return wrapper.response(response, status, statusText, errorData);
     }
   },
+  getWishlistByUserId: async (request, response) => {
+    try {
+      const { userId } = request.params;
+
+      const result = await wishlistModel.getWishlistByUserId(userId);
+
+      if (result.data.length < 1) {
+        return wrapper.response(
+          response,
+          404,
+          `Data By Id ${userId} Not Found`,
+          []
+        );
+      }
+
+      return wrapper.response(
+        response,
+        result.status,
+        "Success Get Data By UserId",
+        result.data
+      );
+    } catch (error) {
+      const {
+        status = 500,
+        statusText = "Internal Server Error",
+        error: errorData = null,
+      } = error;
+      return wrapper.response(response, status, statusText, errorData);
+    }
+  },
 };
