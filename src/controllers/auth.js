@@ -89,7 +89,7 @@ module.exports = {
         role: !checkEmail.data[0].role ? "user" : checkEmail.data[0].role,
       };
 
-      const token = jwt.sign(payload, "RAHASIA", { expiresIn: "24h" });
+      const token = jwt.sign(payload, "RAHASIA", { expiresIn: "2h" });
       // 4. PROSES REPON KE USER
       bcrypt.compare(password, checkEmail.data[0].password, (err, same) => {
         if (same) {
@@ -117,7 +117,7 @@ module.exports = {
       let token = request.headers.authorization;
       console.log(token);
       token = token.split(" ")[1];
-      client.setEx(`accessToken:${token}`, 3600 * 24, token);
+      client.setEx(`accessToken:${token}`, 3600 * 1, token);
       return wrapper.response(response, 200, "Success Logout", null);
     } catch (error) {
       const {

@@ -39,7 +39,7 @@ module.exports = {
           []
         );
       }
-
+      delete result.data[0].password;
       return wrapper.response(
         response,
         result.status,
