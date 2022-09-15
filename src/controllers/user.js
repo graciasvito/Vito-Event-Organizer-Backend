@@ -184,7 +184,7 @@ module.exports = {
   },
   updateImageUser: async (request, response) => {
     try {
-      console.log(request.file);
+      // console.log(request.file);
       const { userId } = request.params;
       const checkId = await userModel.getUserById(userId);
       if (checkId.data.length < 1) {
@@ -199,17 +199,32 @@ module.exports = {
       const today = new Date().toISOString();
       const setData = {
         image: filename || "",
+        // createdAt,
         updatedAt: today,
       };
-      cloudinary.uploader.destroy(checkId.data[0].image, (result) => {
-        console.log(result);
-      });
+      cloudinary.uploader.destroy(checkId.data[0].image, (result) => result);
       const result = await userModel.updateImageUser(userId, setData);
-      // console.log(data);
-      return wrapper.response(response, result.status, "Success Update Image", {
-        userId,
-        image: setData.image,
-      });
+      // console.log(result);
+      const dataSet = result.data.map(
+        ({ userId, image, createdAt, updatedAt }) => ({
+          userId,
+          image,
+          createdAt,
+          updatedAt,
+        })
+      );
+      return wrapper.response(
+        response,
+        result.status,
+        "Success Update Image",
+        dataSet
+        // {
+        //   userId,
+        //   image: setData.image,
+        //   // createdAt: setData.createdAt,
+        //   // updatedAt: setData.updatedAt,
+        // }
+      );
     } catch (error) {
       const {
         status = 500,
@@ -255,8 +270,10 @@ module.exports = {
           wrapper.response(response, 400, "Wrong Old Password", null);
         }
       });
+      const today = new Date().toISOString();
       const setData = {
         userId,
+        updatedAt: today,
       };
 
       const result = await userModel.updateUser(userId, setData);

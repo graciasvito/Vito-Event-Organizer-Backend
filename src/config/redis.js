@@ -1,8 +1,9 @@
+require("dotenv").config();
 const redis = require("redis");
 
-const redisPassword = "yd8rIOnYFwVW3TXLCQAvQcjVDCWmsZRc";
-const redisHost = "redis-19513.c16.us-east-1-2.ec2.cloud.redislabs.com";
-const redisPort = "19513";
+const redisPassword = process.env.REDIS_PASSWORD;
+const redisHost = process.env.REDIS_HOST;
+const redisPort = process.env.REDIS_PORT;
 
 const client = redis.createClient({
   url: `redis://:${redisPassword}@${redisHost}:${redisPort}`,

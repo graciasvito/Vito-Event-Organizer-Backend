@@ -107,6 +107,7 @@ module.exports = {
       // console.log(request.file);
       // console.log(request.body);
       const { filename } = request.file;
+
       const { name, category, location, detail, dateTimeShow, price } =
         request.body;
       const setData = {
@@ -133,7 +134,7 @@ module.exports = {
         statusText = "Internal Server Error",
         error: errorData = null,
       } = error;
-
+      console.log(error);
       return wrapper.response(response, status, statusText, errorData);
     }
   },
