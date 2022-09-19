@@ -1,5 +1,7 @@
+/* eslint-disable consistent-return */
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+
 const authModel = require("../models/auth");
 const wrapper = require("../utils/wrapper");
 const client = require("../config/redis");
@@ -35,6 +37,7 @@ module.exports = {
         password: hashedPassword, // UNTUK PASSWORD BISA DI ENKRIPSI
         role: "user",
       };
+      // PROSES PENGECEKAN APAKAH EMAIL YANG MAU DI DAFTARKAN SUDAH ADA ATAU BELUM ?
       if (checkEmail.data.length > 0) {
         return wrapper.response(
           response,
@@ -43,6 +46,7 @@ module.exports = {
           null
         );
       }
+      // PROSES MENYIMPAN DATA KE DATABASE LEWAT MODEL
       const result = await userModel.createUser(setData);
       // store hash in the database
       // console.log(setData);
@@ -58,11 +62,6 @@ module.exports = {
       return wrapper.response(response, status, statusText, errorData);
     }
   },
-
-  // PROSES PENGECEKAN APAKAH EMAIL YANG MAU DI DAFTARKAN SUDAH ADA ATAU BELUM ?
-
-  // PROSES MENYIMPAN DATA KE DATABASE LEWAT MODEL
-
   login: async (request, response) => {
     try {
       const { email, password } = request.body;
@@ -89,14 +88,21 @@ module.exports = {
         role: !checkEmail.data[0].role ? "user" : checkEmail.data[0].role,
       };
 
-      const token = jwt.sign(payload, "RAHASIA", { expiresIn: "2h" });
+      const token = jwt.sign(payload, process.env.ACCESS_KEYS, {
+        expiresIn: "12h",
+      });
+      const refreshToken = jwt.sign(payload, process.env.REFRESH_KEYS, {
+        expiresIn: "24h",
+      });
       // 4. PROSES REPON KE USER
+      const newResult = {
+        userId: payload.userId,
+        token,
+        refreshToken,
+      };
       bcrypt.compare(password, checkEmail.data[0].password, (err, same) => {
         if (same) {
-          return wrapper.response(response, 200, "Success Login", {
-            userId: payload.userId,
-            token,
-          });
+          return wrapper.response(response, 200, "Success Login", newResult);
           // eslint-disable-next-line no-else-return
         } else {
           // eslint-disable-next-line no-else-return
@@ -115,11 +121,71 @@ module.exports = {
   logout: async (request, response) => {
     try {
       let token = request.headers.authorization;
-      console.log(token);
+      const { refreshtoken } = request.headers;
+
+      // eslint-disable-next-line prefer-destructuring
       token = token.split(" ")[1];
-      client.setEx(`accessToken:${token}`, 3600 * 1, token);
+      client.setEx(`accessToken:${token}`, 3600 * 24, token);
+      client.setEx(`refreshToken:${refreshtoken}`, 3600 * 24, refreshtoken);
       return wrapper.response(response, 200, "Success Logout", null);
     } catch (error) {
+      const {
+        status = 500,
+        statusText = "Internal Server Error",
+        error: errorData = null,
+      } = error;
+      return wrapper.response(response, status, statusText, errorData);
+    }
+  },
+  refresh: async (request, response) => {
+    try {
+      const { refreshtoken } = request.headers;
+
+      if (!refreshtoken) {
+        return wrapper.response(response, 400, "Refresh Token Must Be Filled");
+      }
+
+      const checkTokenBlacklist = await client.get(
+        `refreshToken:${refreshtoken}`
+      );
+
+      if (checkTokenBlacklist) {
+        return wrapper.response(
+          response,
+          403,
+          "Your token is destroyed please login again",
+          null
+        );
+      }
+
+      let payload;
+      let token;
+      let newRefreshToken;
+
+      jwt.verify(refreshtoken, process.env.REFRESH_KEYS, (error, result) => {
+        if (error) {
+          return wrapper.response(response, 403, error.message, null);
+        }
+        payload = {
+          userId: result.userId,
+          role: result.role,
+        };
+        token = jwt.sign(payload, process.env.ACCESS_KEYS, {
+          expiresIn: "12h",
+        });
+        newRefreshToken = jwt.sign(payload, process.env.REFRESH_KEYS, {
+          expiresIn: "36h",
+        });
+        client.setEx(`refreshToken:${refreshtoken}`, 3600 * 36, refreshtoken);
+      });
+
+      return wrapper.response(response, 200, "Success Refresh Token", {
+        userId: payload.userId,
+        token,
+        refreshToken: newRefreshToken,
+      });
+    } catch (error) {
+      // console.log(error);
       const {
         status = 500,
         statusText = "Internal Server Error",

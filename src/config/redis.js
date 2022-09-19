@@ -1,4 +1,3 @@
-require("dotenv").config();
 const redis = require("redis");
 
 const redisPassword = process.env.REDIS_PASSWORD;

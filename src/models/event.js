@@ -5,7 +5,7 @@ module.exports = {
     new Promise((resolve, reject) => {
       supabase
         .from("event")
-        .select("*", { count: "exact" })
+        .select("name", { count: "exact" })
         .then((result) => {
           if (!result.error) {
             resolve(result.count);

@@ -1,13 +1,10 @@
-const { request } = require("express");
 const bookingModel = require("../models/booking");
 const wrapper = require("../utils/wrapper");
 const groupingSection = require("../utils/groupingSection");
-const supabase = require("../config/supabase");
 
 module.exports = {
   createBooking: async (request, response) => {
     try {
-      // console.log(request.body);
       // Proses 1
       const {
         userId,
@@ -18,6 +15,7 @@ module.exports = {
         statusPayment = "success",
         section,
       } = request.body;
+      // console.log(request.body.section);
       const setDataBooking = {
         userId,
         eventId,
@@ -38,19 +36,27 @@ module.exports = {
           statusUsed: false,
         };
         // console.log(setBookingSection);
-        // eslint-disable-next-line no-await-in-loop
+        // eslint-disable-next-line no-await-in-loop, no-unused-vars
         const resultBookingSection = await bookingModel.createBookingSection(
           setBookingSection
         );
       }
-      const result = { ...resultBooking, ...request.body };
+      const result = resultBooking.data.map(({ bookingId }) => ({
+        bookingId,
+        userId,
+        eventId,
+        totalTicket,
+        totalPayment,
+        paymentMethod,
+        section,
+      }));
       // console.log(result);
 
       return wrapper.response(
         response,
-        result.status,
-        "Success Create Data",
-        result.data
+        resultBooking.status,
+        "Success Create Booking",
+        result
       );
     } catch (error) {
       // console.log(error);
@@ -105,7 +111,7 @@ module.exports = {
           []
         );
       }
-      console.log(result.data);
+      // console.log(result.data);
       const resultSection = groupingSection(result);
 
       return wrapper.response(

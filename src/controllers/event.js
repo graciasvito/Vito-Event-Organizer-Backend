@@ -1,4 +1,3 @@
-const { request } = require("express");
 const eventModel = require("../models/event");
 const wrapper = require("../utils/wrapper");
 const client = require("../config/redis");
@@ -8,7 +7,8 @@ const cloudinary = require("../config/cloudinary");
 module.exports = {
   getAllEvent: async (request, response) => {
     try {
-      let { page, limit, searchName, sort, searchDateShow } = request.query;
+      let { page, limit, searchName } = request.query;
+      const { sort, searchDateShow } = request.query;
       page = +page || 1;
       limit = +limit || 10;
       searchName = `%${searchName}%` || "";
@@ -125,7 +125,7 @@ module.exports = {
       return wrapper.response(
         response,
         result.status,
-        "Success Create Data",
+        "Success Create Event",
         result.data
       );
     } catch (error) {
@@ -134,7 +134,7 @@ module.exports = {
         statusText = "Internal Server Error",
         error: errorData = null,
       } = error;
-      console.log(error);
+      // console.log(error);
       return wrapper.response(response, status, statusText, errorData);
     }
   },
@@ -148,7 +148,7 @@ module.exports = {
         request.body;
 
       const checkId = await eventModel.getEventById(eventId);
-      console.log(checkId);
+      // console.log(checkId);
       if (checkId.data.length < 1) {
         return wrapper.response(
           response,
@@ -157,6 +157,7 @@ module.exports = {
           []
         );
       }
+
       const today = new Date().toISOString();
       const setData = {
         name,
@@ -168,9 +169,7 @@ module.exports = {
         image: filename || "",
         updatedAt: today,
       };
-      cloudinary.uploader.destroy(checkId.data[0].image, (result) => {
-        console.log(result);
-      });
+      cloudinary.uploader.destroy(checkId.data[0].image, (result) => result);
 
       const result = await eventModel.updateEvent(eventId, setData);
 
@@ -186,6 +185,7 @@ module.exports = {
         statusText = "Internal Server Error",
         error: errorData = null,
       } = error;
+      console.log(error);
       return wrapper.response(response, status, statusText, errorData);
     }
   },
@@ -203,9 +203,7 @@ module.exports = {
           []
         );
       }
-      cloudinary.uploader.destroy(checkId.data[0].image, (result) => {
-        console.log(result);
-      });
+      cloudinary.uploader.destroy(checkId.data[0].image, (result) => result);
       const result = await eventModel.deleteEvent(eventId);
 
       return wrapper.response(

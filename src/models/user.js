@@ -7,7 +7,11 @@ module.exports = {
         .from("user")
         .select("*")
         .then((result) => {
-          // console.log(result);
+          if (!result.error) {
+            resolve(result);
+          } else {
+            reject(result);
+          }
         });
     }),
   getUserById: (userId) =>
@@ -56,6 +60,7 @@ module.exports = {
     new Promise((resolve, reject) => {
       supabase
         .from("user")
+        .select("*")
         .delete(data)
         .eq("userId", userId)
         .then((result) => {

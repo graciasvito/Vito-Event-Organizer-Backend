@@ -1,5 +1,6 @@
+/* eslint-disable consistent-return */
 const jwt = require("jsonwebtoken");
-// const client = require("../config/redis");
+const client = require("../config/redis");
 const wrapper = require("../utils/wrapper");
 
 module.exports = {
@@ -13,19 +14,19 @@ module.exports = {
 
       // eslint-disable-next-line prefer-destructuring
       token = token.split(" ")[1];
-      // const checkTokenBlacklist = await client.get(`accessToken:${token}`);
+      const checkTokenBlacklist = await client.get(`accessToken:${token}`);
       // console.log(checkTokenBlacklist);
 
-      // if (checkTokenBlacklist) {
-      //   return wrapper.response(
-      //     response,
-      //     403,
-      //     "Your token is destroyed please login again",
-      //     null
-      //   );
-      // }
+      if (checkTokenBlacklist) {
+        return wrapper.response(
+          response,
+          403,
+          "Your token is destroyed please login again",
+          null
+        );
+      }
 
-      jwt.verify(token, "RAHASIA", (error, result) => {
+      jwt.verify(token, process.env.ACCESS_KEYS, (error, result) => {
         if (error) {
           return wrapper.response(response, 403, error.message, null);
         }
@@ -41,7 +42,7 @@ module.exports = {
         next();
       });
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   },
   isAdmin: async (request, response, next) => {
@@ -55,7 +56,7 @@ module.exports = {
 
       // console.log(request.decodeToken);
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   },
 };

@@ -1,4 +1,3 @@
-const { request } = require("express");
 const bcrypt = require("bcrypt");
 const userModel = require("../models/user");
 // const { response } = require("../utils/wrapper");
@@ -8,8 +7,9 @@ const cloudinary = require("../config/cloudinary");
 module.exports = {
   getAllUser: async (request, response) => {
     try {
-      // console.log(request.query);
       const result = await userModel.getAllUser();
+      delete result.data[0].password;
+      delete result.data[0].email;
       return wrapper.response(
         response,
         result.status,
@@ -122,7 +122,7 @@ module.exports = {
         );
       }
       const today = new Date().toISOString();
-      console.log(today);
+
       const setData = {
         name,
         username,
@@ -136,6 +136,7 @@ module.exports = {
 
       const result = await userModel.updateUser(userId, setData);
       delete result.data[0].password;
+      delete result.data[0].email;
       return wrapper.response(
         response,
         result.status,
@@ -166,7 +167,8 @@ module.exports = {
         );
       }
       const result = await userModel.deleteUser(userId);
-
+      delete result.data[0].password;
+      delete result.data[0].email;
       return wrapper.response(
         response,
         result.status,
@@ -205,14 +207,12 @@ module.exports = {
       cloudinary.uploader.destroy(checkId.data[0].image, (result) => result);
       const result = await userModel.updateImageUser(userId, setData);
       // console.log(result);
-      const dataSet = result.data.map(
-        ({ userId, image, createdAt, updatedAt }) => ({
-          userId,
-          image,
-          createdAt,
-          updatedAt,
-        })
-      );
+      const dataSet = result.data.map(({ image, createdAt, updatedAt }) => ({
+        userId,
+        image,
+        createdAt,
+        updatedAt,
+      }));
       return wrapper.response(
         response,
         result.status,
