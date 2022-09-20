@@ -39,8 +39,22 @@ module.exports = {
         email,
         password: hashedPassword, // UNTUK PASSWORD BISA DI ENKRIPSI
         role: "user",
+        statusUser: "Unverified",
       };
+      // console.log(checkEmail);
+
       // PROSES PENGECEKAN APAKAH EMAIL YANG MAU DI DAFTARKAN SUDAH ADA ATAU BELUM ?
+      if (
+        checkEmail.data.length > 0 &&
+        checkEmail.data[0].statusUser === "Unverified"
+      ) {
+        return wrapper.response(
+          response,
+          400,
+          "Email is not verified, please check your email !",
+          null
+        );
+      }
       if (checkEmail.data.length > 0) {
         return wrapper.response(
           response,
@@ -51,51 +65,33 @@ module.exports = {
       }
       // PROSES MENYIMPAN DATA KE DATABASE LEWAT MODEL
       const result = await userModel.createUser(setData);
+      const otp = otpGenerator.generate(6, {
+        upperCaseAlphabets: false,
+        specialChars: false,
+        lowerCaseAlphabets: false,
+      });
+      // console.log(otp);
       const setMailOptions = {
         to: email,
         name: username,
         subject: "Email Verification !",
+        otp,
         template: "verificationEmail.html",
         buttonUrl: "http://localhost:3001/api/auth/verif/123456",
       };
 
       await sendMail(setMailOptions);
-
+      client.setEx(`otp:${(otp, result.data[0].userId)}`, 3600, {
+        result: result.data,
+      });
       return wrapper.response(
         response,
         200,
         "Success Register Please Check Your Email",
-        null
+        { userId: result.data[0].userId }
       );
-      // const transporter = nodemailer.createTransport({
-      //   service: "gmail",
-      //   auth: {
-      //     type: "OAuth2",
-      //     user: "vitoristo@gmail.com",
-      //     clientId: gmail.clientId,
-      //     clientSecret: gmail.clientSecret,
-      //     refreshToken: gmail.refreshToken,
-      //     accessToken: gmail.accessToken,
-      //   },
-      // });
-      // const mailOptions = {
-      //   from: '"Vito Event Organizing" <vitoristo1@gmail.com>',
-      //   to: "emaildummy822@gmail.com",
-      //   subject: "Activation Account",
-      //   html: "Silahkan aktivasi akun anda !",
-      // };
-
-      // transporter.sendMail(mailOptions, (error, result) => {
-      //   console.log(error);
-      //   console.log(result);
-      // });
-      // store hash in the database
-      // console.log(setData);
-      // return wrapper.response(response, result.status, "Success Register", {
-      //   userId: result.data[0].userId,
-      // });
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       const {
         status = 500,
         statusText = "Internal Server Error",
@@ -236,4 +232,51 @@ module.exports = {
       return wrapper.response(response, status, statusText, errorData);
     }
   },
+  // verify: async (request, response) => {
+  //   try {
+  //     let otp = request.params;
+  //     // console.log(otp);
+  //     if (!otp) {
+  //       return wrapper.response(response, 403, "Please Enter OTP", null);
+  //     }
+
+  //     // eslint-disable-next-line prefer-destructuring
+  //     otp = Object.keys(otp).map((k) => otp[k])[0];
+  //     // console.log(otp);
+  //     const checkOTP = await client.get(`otp:${otp}`);
+
+  //     if (checkOTP) {
+  //       return wrapper.response(
+  //         response,
+  //         200,
+  //         "Success Verified, Please Login",
+  //         null
+  //       );
+  //     }
+  //     // return wrapper.response(
+  //     //   response,
+  //     //   200,
+  //     //   "Success Get Greetings",
+  //     //   "Hello World !"
+  //     // );
+  //     // const checkOtp = await client.get(`otp:${otp}`);
+
+  //     // if (checkOtp) {
+  //     //   return wrapper.response(
+  //     //     response,
+  //     //     200,
+  //     //     "Success Verified Email, Please Login !",
+  //     //     null
+  //     //   );
+  //     // }
+  //   } catch (error) {
+  //     console.log(error);
+  //     const {
+  //       status = 500,
+  //       statusText = "Internal Server Error",
+  //       error: errorData = null,
+  //     } = error;
+  //     return wrapper.response(response, status, statusText, errorData);
+  //   }
+  // },
 };

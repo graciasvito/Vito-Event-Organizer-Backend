@@ -7,6 +7,7 @@ module.exports = {
   authentication: async (request, response, next) => {
     try {
       let token = request.headers.authorization;
+      console.log(token);
 
       if (!token) {
         return wrapper.response(response, 403, "Please Login First", null);
@@ -14,8 +15,9 @@ module.exports = {
 
       // eslint-disable-next-line prefer-destructuring
       token = token.split(" ")[1];
+      console.log(token);
       const checkTokenBlacklist = await client.get(`accessToken:${token}`);
-      // console.log(checkTokenBlacklist);
+      console.log(checkTokenBlacklist);
 
       if (checkTokenBlacklist) {
         return wrapper.response(
