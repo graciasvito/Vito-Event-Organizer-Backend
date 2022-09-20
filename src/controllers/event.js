@@ -23,8 +23,7 @@ module.exports = {
         totalData,
       };
       const offset = page * limit - limit;
-      // const day = new Date(searchDateShow);
-      // const nextDay = new Date(new Date(day).setDate(day.getDate() + 1));
+
       const sortColumn = sort.split(" ")[0];
       let sortType = sort.split(" ")[1];
 
@@ -144,6 +143,7 @@ module.exports = {
       // console.log(request.body);
       const { eventId } = request.params;
       const { filename } = request.file;
+      // console.log(request.file);
       const { name, category, location, detail, dateTimeShow, price } =
         request.body;
 
@@ -158,7 +158,10 @@ module.exports = {
         );
       }
 
-      const today = new Date().toISOString();
+      const today = new Date().toLocaleString("en-US", {
+        timeZone: "Asia/Jakarta",
+      });
+
       const setData = {
         name,
         category,

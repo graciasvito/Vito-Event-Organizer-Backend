@@ -121,7 +121,9 @@ module.exports = {
           []
         );
       }
-      const today = new Date().toISOString();
+      const today = new Date().toLocaleString("en-US", {
+        timeZone: "Asia/Jakarta",
+      });
 
       const setData = {
         name,
@@ -198,7 +200,9 @@ module.exports = {
         );
       }
       const { filename } = request.file;
-      const today = new Date().toISOString();
+      const today = new Date().toLocaleString("en-US", {
+        timeZone: "Asia/Jakarta",
+      });
       const setData = {
         image: filename || "",
         // createdAt,

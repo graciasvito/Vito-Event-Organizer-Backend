@@ -1,11 +1,14 @@
 /* eslint-disable consistent-return */
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-
+// const nodemailer = require("nodemailer");
+const otpGenerator = require("otp-generator");
 const authModel = require("../models/auth");
 const wrapper = require("../utils/wrapper");
 const client = require("../config/redis");
 const userModel = require("../models/user");
+// const gmail = require("../config/gmail");
+const { sendMail } = require("../utils/mail");
 
 module.exports = {
   showGreetings: async (request, response) => {
@@ -48,12 +51,51 @@ module.exports = {
       }
       // PROSES MENYIMPAN DATA KE DATABASE LEWAT MODEL
       const result = await userModel.createUser(setData);
+      const setMailOptions = {
+        to: email,
+        name: username,
+        subject: "Email Verification !",
+        template: "verificationEmail.html",
+        buttonUrl: "http://localhost:3001/api/auth/verif/123456",
+      };
+
+      await sendMail(setMailOptions);
+
+      return wrapper.response(
+        response,
+        200,
+        "Success Register Please Check Your Email",
+        null
+      );
+      // const transporter = nodemailer.createTransport({
+      //   service: "gmail",
+      //   auth: {
+      //     type: "OAuth2",
+      //     user: "vitoristo@gmail.com",
+      //     clientId: gmail.clientId,
+      //     clientSecret: gmail.clientSecret,
+      //     refreshToken: gmail.refreshToken,
+      //     accessToken: gmail.accessToken,
+      //   },
+      // });
+      // const mailOptions = {
+      //   from: '"Vito Event Organizing" <vitoristo1@gmail.com>',
+      //   to: "emaildummy822@gmail.com",
+      //   subject: "Activation Account",
+      //   html: "Silahkan aktivasi akun anda !",
+      // };
+
+      // transporter.sendMail(mailOptions, (error, result) => {
+      //   console.log(error);
+      //   console.log(result);
+      // });
       // store hash in the database
       // console.log(setData);
-      return wrapper.response(response, result.status, "Success Create Data", {
-        userId: result.data[0].userId,
-      });
+      // return wrapper.response(response, result.status, "Success Register", {
+      //   userId: result.data[0].userId,
+      // });
     } catch (error) {
+      console.log(error);
       const {
         status = 500,
         statusText = "Internal Server Error",
