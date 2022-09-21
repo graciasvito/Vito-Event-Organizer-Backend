@@ -41,7 +41,6 @@ module.exports = {
         role: "user",
         statusUser: "Unverified",
       };
-      // console.log(checkEmail);
 
       // PROSES PENGECEKAN APAKAH EMAIL YANG MAU DI DAFTARKAN SUDAH ADA ATAU BELUM ?
       if (
@@ -70,6 +69,8 @@ module.exports = {
         specialChars: false,
         lowerCaseAlphabets: false,
       });
+      const checkId = result.data[0].userId;
+      // console.log(checkId);
       // console.log(otp);
       const setMailOptions = {
         to: email,
@@ -77,13 +78,11 @@ module.exports = {
         subject: "Email Verification !",
         otp,
         template: "verificationEmail.html",
-        buttonUrl: "http://localhost:3001/api/auth/verif/123456",
+        buttonUrl: `http://localhost:3001/api/auth/verify/${otp}`,
       };
 
       await sendMail(setMailOptions);
-      client.setEx(`otp:${(otp, result.data[0].userId)}`, 3600, {
-        result: result.data,
-      });
+      client.setEx(`otp:${otp}`, 3600, checkId);
       return wrapper.response(
         response,
         200,
@@ -232,51 +231,57 @@ module.exports = {
       return wrapper.response(response, status, statusText, errorData);
     }
   },
-  // verify: async (request, response) => {
-  //   try {
-  //     let otp = request.params;
-  //     // console.log(otp);
-  //     if (!otp) {
-  //       return wrapper.response(response, 403, "Please Enter OTP", null);
-  //     }
+  verify: async (request, response) => {
+    try {
+      const { otp } = request.params;
+      // console.log(otp);
 
-  //     // eslint-disable-next-line prefer-destructuring
-  //     otp = Object.keys(otp).map((k) => otp[k])[0];
-  //     // console.log(otp);
-  //     const checkOTP = await client.get(`otp:${otp}`);
+      const checkOTP = await client.get(`otp:${otp}`);
+      // console.log(checkOTP);
+      if (!checkOTP) {
+        return wrapper.response(response, 403, "Wrong OTP", null);
+      }
+      const setData = {
+        statusUser: "Verified",
+      };
+      const result = await userModel.updateUser(checkOTP, setData);
 
-  //     if (checkOTP) {
-  //       return wrapper.response(
-  //         response,
-  //         200,
-  //         "Success Verified, Please Login",
-  //         null
-  //       );
-  //     }
-  //     // return wrapper.response(
-  //     //   response,
-  //     //   200,
-  //     //   "Success Get Greetings",
-  //     //   "Hello World !"
-  //     // );
-  //     // const checkOtp = await client.get(`otp:${otp}`);
+      client.del(`otp:${otp}`);
+      return wrapper.response(
+        response,
+        result.status,
+        "Success Verified, Please Login",
+        { userId: checkOTP }
+      );
 
-  //     // if (checkOtp) {
-  //     //   return wrapper.response(
-  //     //     response,
-  //     //     200,
-  //     //     "Success Verified Email, Please Login !",
-  //     //     null
-  //     //   );
-  //     // }
-  //   } catch (error) {
-  //     console.log(error);
-  //     const {
-  //       status = 500,
-  //       statusText = "Internal Server Error",
-  //       error: errorData = null,
-  //     } = error;
-  //     return wrapper.response(response, status, statusText, errorData);
-  //   }
-  // },
+      // eslint-disable-next-line prefer-destructuring
+
+      // // console.log(otp);
+
+      // return wrapper.response(
+      //   response,
+      //   200,
+      //   "Success Get Greetings",
+      //   "Hello World !"
+      // );
+      // const checkOtp = await client.get(`otp:${otp}`);
+
+      // if (checkOtp) {
+      //   return wrapper.response(
+      //     response,
+      //     200,
+      //     "Success Verified Email, Please Login !",
+      //     null
+      //   );
+      // }
+    } catch (error) {
+      // console.log(error);
+      const {
+        status = 500,
+        statusText = "Internal Server Error",
+        error: errorData = null,
+      } = error;
+      return wrapper.response(response, status, statusText, errorData);
+    }
+  },
 };

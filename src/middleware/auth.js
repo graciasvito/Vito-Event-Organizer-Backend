@@ -2,12 +2,12 @@
 const jwt = require("jsonwebtoken");
 const client = require("../config/redis");
 const wrapper = require("../utils/wrapper");
+const authModel = require("../models/auth");
 
 module.exports = {
   authentication: async (request, response, next) => {
     try {
       let token = request.headers.authorization;
-      console.log(token);
 
       if (!token) {
         return wrapper.response(response, 403, "Please Login First", null);
@@ -15,9 +15,8 @@ module.exports = {
 
       // eslint-disable-next-line prefer-destructuring
       token = token.split(" ")[1];
-      console.log(token);
+
       const checkTokenBlacklist = await client.get(`accessToken:${token}`);
-      console.log(checkTokenBlacklist);
 
       if (checkTokenBlacklist) {
         return wrapper.response(
@@ -56,6 +55,27 @@ module.exports = {
       }
       return next();
 
+      // console.log(request.decodeToken);
+    } catch (error) {
+      // console.log(error);
+    }
+  },
+  isVerify: async (request, response, next) => {
+    try {
+      // PROSES UNTUK PENGECEKAN ROLE
+      const { email } = request.body;
+      const checkStatus = await authModel.getUserByEmail(email);
+      // console.log(checkStatus.data[0].statusUser);
+      if (checkStatus.data[0].statusUser === "Verified") {
+        return next();
+      }
+
+      return wrapper.response(
+        response,
+        403,
+        "You Haven't Verified Your Email",
+        null
+      );
       // console.log(request.decodeToken);
     } catch (error) {
       // console.log(error);
