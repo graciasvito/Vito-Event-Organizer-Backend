@@ -19,12 +19,12 @@ module.exports = {
       const setData = {
         username,
         email,
-        password: hashedPassword, // UNTUK PASSWORD BISA DI ENKRIPSI
+        password: hashedPassword,
         role: "user",
         statusUser: "Unverified",
       };
 
-      // PROSES PENGECEKAN APAKAH EMAIL YANG MAU DI DAFTARKAN SUDAH ADA ATAU BELUM ?
+      // checking email in database
       if (
         checkEmail.data.length > 0 &&
         checkEmail.data[0].statusUser === "Unverified"
@@ -44,16 +44,16 @@ module.exports = {
           null
         );
       }
-      // PROSES MENYIMPAN DATA KE DATABASE LEWAT MODEL
+      // save data by model
       const result = await userModel.createUser(setData);
+      // create otp
       const otp = otpGenerator.generate(6, {
         upperCaseAlphabets: false,
         specialChars: false,
         lowerCaseAlphabets: false,
       });
       const { userId } = result.data[0];
-      // console.log(checkId);
-      // console.log(otp);
+      // mailing
       const setMailOptions = {
         to: email,
         name: username,
@@ -64,6 +64,7 @@ module.exports = {
       };
 
       await sendMail(setMailOptions);
+      // save otp in redis
       client.setEx(`otp:${otp}`, 3600, userId);
       return wrapper.response(
         response,
@@ -72,7 +73,6 @@ module.exports = {
         { userId: result.data[0].userId }
       );
     } catch (error) {
-      // console.log(error);
       const {
         status = 500,
         statusText = "Internal Server Error",
@@ -85,22 +85,11 @@ module.exports = {
     try {
       const { email, password } = request.body;
 
-      // 1. PROSES PENGECEKAN EMAIL
+      // check email in database
       const checkEmail = await authModel.getUserByEmail(email);
       if (checkEmail.data.length < 1) {
         return wrapper.response(response, 404, "Email Not Registed", null);
       }
-
-      // 2. PROSES PENCOCOKAN PASSWORD
-      // if (password !== checkEmail.data[0].password) {
-      // return wrpper.response(response, 400, "Wrong Password", null);
-      // }
-
-      // 3. PROSES PEMBUATAN TOKEN JWT
-      // PAYLOAD = DATA YANG MAU DISIMPAN/DIJADIKAN TOKEN
-      // KEY = KATA KUNCI BISA DI GENERATE ATAU DIBUAT LANGSUNG
-      // const payload = checkEmail.data[0];
-      // delete payload.password;
 
       const payload = {
         userId: checkEmail.data[0].userId,
@@ -113,20 +102,18 @@ module.exports = {
       const refreshToken = jwt.sign(payload, process.env.REFRESH_KEYS, {
         expiresIn: "24h",
       });
-      // 4. PROSES REPON KE USER
+      // response to user
       const newResult = {
         userId: payload.userId,
         token,
         refreshToken,
       };
+      // compare input password with password in database
       bcrypt.compare(password, checkEmail.data[0].password, (err, same) => {
         if (same) {
           return wrapper.response(response, 200, "Success Login", newResult);
-          // eslint-disable-next-line no-else-return
-        } else {
-          // eslint-disable-next-line no-else-return
-          wrapper.response(response, 400, "Wrong Password", null);
         }
+        return wrapper.response(response, 400, "Wrong Password", null);
       });
     } catch (error) {
       const {
@@ -139,13 +126,14 @@ module.exports = {
   },
   logout: async (request, response) => {
     try {
-      let token = request.headers.authorization;
+      const token = request.headers.authorization;
       const { refreshtoken } = request.headers;
 
-      // eslint-disable-next-line prefer-destructuring
-      token = token.split(" ")[1];
-      client.setEx(`accessToken:${token}`, 3600 * 24, token);
+      token.split(" ")[1] = token;
+
+      client.setEx(`accessToken:${token.split(" ")[1]}`, 3600 * 24, token);
       client.setEx(`refreshToken:${refreshtoken}`, 3600 * 24, refreshtoken);
+
       return wrapper.response(response, 200, "Success Logout", null);
     } catch (error) {
       const {
@@ -216,10 +204,9 @@ module.exports = {
   verify: async (request, response) => {
     try {
       const { otp } = request.params;
-      // console.log(otp);
 
       const checkOTP = await client.get(`otp:${otp}`);
-      // console.log(checkOTP);
+
       if (!checkOTP) {
         return wrapper.response(response, 403, "Wrong OTP", null);
       }
@@ -235,27 +222,6 @@ module.exports = {
         "Success Verified, Please Login",
         { userId: checkOTP }
       );
-
-      // eslint-disable-next-line prefer-destructuring
-
-      // // console.log(otp);
-
-      // return wrapper.response(
-      //   response,
-      //   200,
-      //   "Success Get Greetings",
-      //   "Hello World !"
-      // );
-      // const checkOtp = await client.get(`otp:${otp}`);
-
-      // if (checkOtp) {
-      //   return wrapper.response(
-      //     response,
-      //     200,
-      //     "Success Verified Email, Please Login !",
-      //     null
-      //   );
-      // }
     } catch (error) {
       // console.log(error);
       const {

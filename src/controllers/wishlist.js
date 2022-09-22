@@ -1,11 +1,9 @@
 const wishlistModel = require("../models/wishlist");
 const wrapper = require("../utils/wrapper");
-const userModel = require("../models/user");
 
 module.exports = {
   getAllWishlist: async (request, response) => {
     try {
-      // console.log(request.query);
       let { page, limit } = request.query;
       page = +page;
       limit = +limit;
@@ -13,7 +11,6 @@ module.exports = {
       const totalData = await wishlistModel.getCountWishlist();
       const totalPage = Math.ceil(totalData / limit);
       const pagination = {
-        // page, totalPage, limit, totalData
         page,
         totalPage,
         limit,
@@ -30,7 +27,6 @@ module.exports = {
         pagination
       );
     } catch (error) {
-      // console.log(error);
       const {
         status = 500,
         statusText = "Internal Server Error",
@@ -41,7 +37,6 @@ module.exports = {
   },
   createWishlist: async (request, response) => {
     try {
-      // console.log(request.body);
       const { eventId, userId } = request.body;
       const setData = {
         eventId,
@@ -131,7 +126,7 @@ module.exports = {
       const { userId } = request.params;
 
       const result = await wishlistModel.getWishlistByUserId(userId);
-      console.log(result);
+
       if (result.data.length < 1) {
         return wrapper.response(
           response,

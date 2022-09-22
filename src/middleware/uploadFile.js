@@ -25,7 +25,7 @@ module.exports = {
       }
 
       // Everything went fine.
-      next();
+      return next();
     });
   },
   updateImageUser: (request, response, next) => {
@@ -39,12 +39,12 @@ module.exports = {
     const upload = multer({
       storage,
       limits: { fileSize: 512000 },
-      fileFilter(req, file, callback) {
+      fileFilter: (req, file, callback) => {
         const ext = file.mimetype.split("/")[1];
         if (ext !== "png" && ext !== "jpg" && ext !== "gif" && ext !== "jpeg") {
           return callback(new Error("Only images are allowed"));
         }
-        callback(null, req);
+        return callback(null, req);
       },
     }).single("image");
 
@@ -59,7 +59,7 @@ module.exports = {
       }
 
       // Everything went fine.
-      next();
+      return next();
     });
   },
   updateImageEvent: (request, response, next) => {
@@ -73,12 +73,12 @@ module.exports = {
     const upload = multer({
       storage,
       limits: { fileSize: 512000 },
-      fileFilter(req, file, callback) {
+      fileFilter: (req, file, callback) => {
         const ext = file.mimetype.split("/")[1];
         if (ext !== "png" && ext !== "jpg" && ext !== "gif" && ext !== "jpeg") {
           return callback(new Error("Only images are allowed"));
         }
-        callback(null, req);
+        return callback(null, req);
       },
     }).single("image");
 
@@ -93,7 +93,7 @@ module.exports = {
       }
 
       // Everything went fine.
-      next();
+      return next();
     });
   },
 };

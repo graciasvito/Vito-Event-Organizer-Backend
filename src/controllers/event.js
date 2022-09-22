@@ -2,7 +2,6 @@ const eventModel = require("../models/event");
 const wrapper = require("../utils/wrapper");
 const client = require("../config/redis");
 const cloudinary = require("../config/cloudinary");
-// const { search } = require("../config/cloudinary");
 
 module.exports = {
   getAllEvent: async (request, response) => {
@@ -11,7 +10,7 @@ module.exports = {
       const { sort, searchDateShow } = request.query;
       page = +page || 1;
       limit = +limit || 10;
-      searchName = `%${searchName}%` || "";
+      searchName = `%${searchName}%`;
 
       const totalData = await eventModel.getCountEvent();
       const totalPage = Math.ceil(totalData / limit);
@@ -61,7 +60,6 @@ module.exports = {
         pagination
       );
     } catch (error) {
-      // console.log(error);
       const {
         status = 500,
         statusText = "Internal Server Error",
@@ -142,7 +140,7 @@ module.exports = {
       // console.log(request.params);
       // console.log(request.body);
       const { eventId } = request.params;
-      const { filename } = request.file;
+
       // console.log(request.file);
       const { name, category, location, detail, dateTimeShow, price } =
         request.body;
@@ -162,17 +160,20 @@ module.exports = {
         timeZone: "Asia/Jakarta",
       });
 
-      const setData = {
+      let setData = {
         name,
         category,
         location,
         detail,
         dateTimeShow,
         price,
-        image: filename || "",
         updatedAt: today,
       };
-      cloudinary.uploader.destroy(checkId.data[0].image, (result) => result);
+      if (request.file) {
+        const { filename } = request.file;
+        setData = { ...setData, image: filename || "" };
+        cloudinary.uploader.destroy(checkId.data[0].image, (result) => result);
+      }
 
       const result = await eventModel.updateEvent(eventId, setData);
 
@@ -188,7 +189,7 @@ module.exports = {
         statusText = "Internal Server Error",
         error: errorData = null,
       } = error;
-      console.log(error);
+      // console.log(error);
       return wrapper.response(response, status, statusText, errorData);
     }
   },
@@ -225,16 +226,3 @@ module.exports = {
     }
   },
 };
-
-// const sortColumn = sort.split(" ")[0];
-// let sortType = sort.split(" ")[1];
-
-// if (sortType.toLowerCase() === "asc") {
-// sortType = true;
-// } else {
-// sortType = false
-// }
-/* const day = new Date("dari postman");
-const nextDay = new Date(new Date(day).setDate(day.getDate() + 1)); 
-default nya gimana yang search by dateTimeShow?
-datanya bakal ketampil semua */

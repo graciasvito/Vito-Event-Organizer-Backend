@@ -1,4 +1,3 @@
-const { request } = require("express");
 const productModel = require("../models/product");
 const wrapper = require("../utils/wrapper");
 const client = require("../config/redis");
@@ -26,7 +25,8 @@ module.exports = {
   getAllProduct: async (request, response) => {
     try {
       // console.log(request.query);
-      let { page, limit, search, sort, sortType } = request.query;
+      let { page, limit } = request.query;
+      const { search, sort, sortType } = request.query;
       page = +page;
       limit = +limit;
 

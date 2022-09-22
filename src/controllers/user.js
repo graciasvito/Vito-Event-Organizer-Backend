@@ -168,7 +168,9 @@ module.exports = {
           []
         );
       }
+      cloudinary.uploader.destroy(checkId.data[0].image, (result) => result);
       const result = await userModel.deleteUser(userId);
+
       delete result.data[0].password;
       delete result.data[0].email;
       return wrapper.response(
@@ -198,6 +200,9 @@ module.exports = {
           `Data By Id ${userId} Not Found`,
           []
         );
+      }
+      if (!request.file) {
+        return wrapper.response(response, 400, "image must be filled", null);
       }
       const { filename } = request.file;
       const today = new Date().toLocaleString("en-US", {
@@ -271,7 +276,7 @@ module.exports = {
         } // eslint-disable-next-line no-else-return
         else {
           // eslint-disable-next-line no-else-return
-          wrapper.response(response, 400, "Wrong Old Password", null);
+          return wrapper.response(response, 400, "Wrong Old Password", null);
         }
       });
       const today = new Date().toISOString();

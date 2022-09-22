@@ -15,7 +15,7 @@ module.exports = {
         statusPayment = "success",
         section,
       } = request.body;
-      // console.log(request.body.section);
+
       const setDataBooking = {
         userId,
         eventId,
@@ -26,21 +26,19 @@ module.exports = {
       };
 
       const resultBooking = await bookingModel.createBooking(setDataBooking);
-      // console.log(resultBooking);
+
       // Proses 2
+      let setBookingSection;
 
       for (let i = 0; i < section.length; i += 1) {
-        const setBookingSection = {
+        setBookingSection = {
           bookingId: resultBooking.data[0].bookingId,
           section: section[i],
           statusUsed: false,
         };
-        // console.log(setBookingSection);
-        // eslint-disable-next-line no-await-in-loop, no-unused-vars
-        const resultBookingSection = await bookingModel.createBookingSection(
-          setBookingSection
-        );
+        bookingModel.createBookingSection(setBookingSection);
       }
+
       const result = resultBooking.data.map(({ bookingId }) => ({
         bookingId,
         userId,
@@ -71,14 +69,16 @@ module.exports = {
   getBookingByUserId: async (request, response) => {
     try {
       const { userId } = request.params;
-
+      if (request.decodeToken.userId !== userId) {
+        return wrapper.response(response, 400, "Data not found", null);
+      }
       const result = await bookingModel.getBookingByUserId(userId);
 
       if (result.data.length < 1) {
         return wrapper.response(
           response,
           404,
-          `Data By Id ${userId} Not Found`,
+          `You don't have any booking history.`,
           []
         );
       }
