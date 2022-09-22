@@ -11,24 +11,6 @@ const userModel = require("../models/user");
 const { sendMail } = require("../utils/mail");
 
 module.exports = {
-  showGreetings: async (request, response) => {
-    try {
-      // return response.status(200).send("Hello World!");
-      return wrapper.response(
-        response,
-        200,
-        "Success Get Greetings",
-        "Hello World !"
-      );
-    } catch (error) {
-      const {
-        status = 500,
-        statusText = "Internal Server Error",
-        error: errorData = null,
-      } = error;
-      return wrapper.response(response, status, statusText, errorData);
-    }
-  },
   register: async (request, response) => {
     try {
       const { username, email, password } = request.body;
@@ -69,7 +51,7 @@ module.exports = {
         specialChars: false,
         lowerCaseAlphabets: false,
       });
-      const checkId = result.data[0].userId;
+      const { userId } = result.data[0];
       // console.log(checkId);
       // console.log(otp);
       const setMailOptions = {
@@ -82,7 +64,7 @@ module.exports = {
       };
 
       await sendMail(setMailOptions);
-      client.setEx(`otp:${otp}`, 3600, checkId);
+      client.setEx(`otp:${otp}`, 3600, userId);
       return wrapper.response(
         response,
         200,
