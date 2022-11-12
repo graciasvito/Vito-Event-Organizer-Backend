@@ -1,8 +1,8 @@
 module.exports = {
-  response: (response, status, msg, data, pagination) => {
+  response: (response, status, message, data, pagination) => {
     const result = {
       status,
-      message: msg,
+      message,
       data, // data: data
       pagination, // pagination : pagination
     };

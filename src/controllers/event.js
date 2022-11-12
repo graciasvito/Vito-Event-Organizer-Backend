@@ -101,8 +101,8 @@ module.exports = {
   },
   createEvent: async (request, response) => {
     try {
-      // console.log(request.file);
-      // console.log(request.body);
+      console.log(request.file);
+      console.log(request.body);
       const { filename } = request.file;
 
       const { name, category, location, detail, dateTimeShow, price } =

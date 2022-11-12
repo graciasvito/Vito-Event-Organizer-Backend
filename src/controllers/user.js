@@ -270,26 +270,34 @@ module.exports = {
           null
         );
       }
-      bcrypt.compare(oldPassword, checkId.data[0].password, (error, same) => {
-        if (same) {
-          return hashedPassword;
-        } // eslint-disable-next-line no-else-return
-        else {
-          // eslint-disable-next-line no-else-return
-          return wrapper.response(response, 400, "Wrong Old Password", null);
+
+      const validate = await bcrypt.compare(
+        oldPassword,
+        checkId.data[0].password
+      );
+
+      if (!validate) {
+        if (!validate) {
+          return wrapper.response(response, 401, "Wrong Password!", null);
         }
-      });
+      }
+
       const today = new Date().toISOString();
       const setData = {
-        userId,
+        hashedPassword,
         updatedAt: today,
       };
 
-      const result = await userModel.updateUser(userId, setData);
+      const result = await userModel.updateUserPassword(userId, setData);
 
-      return wrapper.response(response, result.status, "Success Update Data", {
-        userId: setData.userId,
-      });
+      return wrapper.response(
+        response,
+        result.status,
+        "Success Update Password",
+        {
+          userId: setData.userId,
+        }
+      );
     } catch (error) {
       const {
         status = 500,

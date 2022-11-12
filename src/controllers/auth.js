@@ -46,6 +46,7 @@ module.exports = {
       }
       // save data by model
       const result = await userModel.createUser(setData);
+
       // create otp
       const otp = otpGenerator.generate(6, {
         upperCaseAlphabets: false,
