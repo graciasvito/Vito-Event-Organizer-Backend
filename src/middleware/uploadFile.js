@@ -38,7 +38,7 @@ module.exports = {
 
     const upload = multer({
       storage,
-      limits: { fileSize: 512000 },
+      limits: { fileSize: 4096000 },
       fileFilter: (req, file, callback) => {
         const ext = file.mimetype.split("/")[1];
         if (ext !== "png" && ext !== "jpg" && ext !== "gif" && ext !== "jpeg") {
@@ -72,7 +72,7 @@ module.exports = {
 
     const upload = multer({
       storage,
-      limits: { fileSize: 512000 },
+      limits: { fileSize: 2048000 },
       fileFilter: (req, file, callback) => {
         const ext = file.mimetype.split("/")[1];
         if (ext !== "png" && ext !== "jpg" && ext !== "gif" && ext !== "jpeg") {
