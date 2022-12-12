@@ -43,6 +43,6 @@ module.exports = (result) => {
     };
     newData.push(resultSection);
   });
-  console.log(newData);
+
   return newData;
 };

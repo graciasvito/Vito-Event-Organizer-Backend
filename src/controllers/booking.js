@@ -126,6 +126,7 @@ module.exports = {
         statusText = "Internal Server Error",
         error: errorData = null,
       } = error;
+      console.log(error);
       return wrapper.response(response, status, statusText, errorData);
     }
   },
