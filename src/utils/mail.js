@@ -8,6 +8,9 @@ module.exports = {
     new Promise((resolve, reject) => {
       const transporter = nodemailer.createTransport({
         service: "gmail",
+        host: "smtp.gmail.com",
+        secure: true,
+        port: 465,
         auth: {
           type: "OAuth2",
           user: "vitoristo1@gmail.com",
