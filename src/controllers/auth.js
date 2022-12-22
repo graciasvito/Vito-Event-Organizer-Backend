@@ -61,12 +61,13 @@ module.exports = {
         subject: "Email Verification !",
         otp,
         template: "verificationEmail.html",
-        buttonUrl: `http://localhost:3001/api/auth/verify/${otp}`,
+        buttonUrl: `https://vito-event-organizer-backend.vercel.app/api/auth/verify/${otp}`,
       };
+      // save otp in redis
+      await client.setEx(`otp:${otp}`, 3600, userId);
 
       await sendMail(setMailOptions);
-      // save otp in redis
-      client.setEx(`otp:${otp}`, 3600, userId);
+
       return wrapper.response(
         response,
         200,
@@ -79,6 +80,7 @@ module.exports = {
         statusText = "Internal Server Error",
         error: errorData = null,
       } = error;
+      console.log(error);
       return wrapper.response(response, status, statusText, errorData);
     }
   },
