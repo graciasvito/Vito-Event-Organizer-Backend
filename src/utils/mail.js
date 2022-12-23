@@ -1,21 +1,16 @@
 const nodemailer = require("nodemailer");
 const fs = require("fs");
 const mustache = require("mustache");
-const gmail = require("../config/gmail");
+// const gmail = require("../config/gmail");
+require("dotenv").config();
 
-const sendMail = async (data) => {
+const sendMail = (data) => {
   const transporter = nodemailer.createTransport({
-    service: "gmail",
-    host: "smtp.gmail.com",
-    secure: true,
-    port: 465,
+    host: "smtp.sendgrid.net",
+    port: 587,
     auth: {
-      type: "OAuth2",
-      user: "vitoristo1@gmail.com",
-      clientId: gmail.clientId,
-      clientSecret: gmail.clientSecret,
-      refreshToken: gmail.refreshToken,
-      accessToken: gmail.accessToken,
+      user: "apikey",
+      pass: process.env.SENDGRID_API_KEY,
     },
   });
 
@@ -25,13 +20,12 @@ const sendMail = async (data) => {
   );
 
   const mailOptions = {
-    from: '"Event Organizing" <arkawebdev1@gmail.com>',
+    from: '"Event Organizing" <vitoristo1@gmail.com>',
     to: data.to,
     subject: data.subject,
     html: mustache.render(fileTemplate, { ...data }),
   };
-
-  await transporter.sendMail(mailOptions);
+  transporter.sendMail(mailOptions);
 };
 
 module.exports = { sendMail };
