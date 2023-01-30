@@ -42,31 +42,31 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 
-app.post("/payment", (req, res) => {
-  const dataUser = {
-    userImage:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQhlGt7wy7F7HXycASj8scmRMCoDaElnBa0RA&usqp=CAU",
-    fullName: "Arif Wibowo",
-  };
-  const dataTransaction = {
-    currentBalance: "Rp100.000",
-    amount: "Rp20.000",
-  };
+// app.post("/payment", (req, res) => {
+//   const dataUser = {
+//     userImage:
+//       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQhlGt7wy7F7HXycASj8scmRMCoDaElnBa0RA&usqp=CAU",
+//     fullName: "Arif Wibowo",
+//   };
+//   const dataTransaction = {
+//     currentBalance: "Rp100.000",
+//     amount: "Rp20.000",
+//   };
 
-  const message = {
-    notification: {
-      title: `Payment Successfullt, kamu udah ngirim ke ${dataUser.fullName}`,
-      body: `Kamu ngirim sebesar ${dataTransaction.amount}`,
-    },
-  };
+//   const message = {
+//     notification: {
+//       title: `Payment Successfullt, kamu udah ngirim ke ${dataUser.fullName}`,
+//       body: `Kamu ngirim sebesar ${dataTransaction.amount}`,
+//     },
+//   };
 
-  admin
-    .messaging()
-    .send(message)
-    .then((response) => {
-      console.log("Successfully sent message:", response);
-    })
-    .catch((error) => {
-      console.log("Error sending message:", error);
-    });
-});
+//   admin
+//     .messaging()
+//     .send(message)
+//     .then((response) => {
+//       console.log("Successfully sent message:", response);
+//     })
+//     .catch((error) => {
+//       console.log("Error sending message:", error);
+//     });
+// });

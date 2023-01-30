@@ -1,31 +1,42 @@
 const nodemailer = require("nodemailer");
-const fs = require("fs");
 const mustache = require("mustache");
-// const gmail = require("../config/gmail");
+const fs = require("fs");
+const path = require("path");
+
+const accessToken = require("../config/gmail");
 require("dotenv").config();
 
-const sendMail = (data) => {
+const sendMail = async (data) => {
   const transporter = nodemailer.createTransport({
-    host: "smtp.sendgrid.net",
-    port: 587,
+    service: "gmail",
+    host: "smtp.gmail.com",
+    secure: true,
+    port: 465,
     auth: {
-      user: "apikey",
-      pass: process.env.SENDGRID_API_KEY,
+      type: "OAuth2",
+      user: "vitoristo1@gmail.com",
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      refreshToken: process.env.GOOGLE_REFRESH_TOKEN,
+      accessToken,
     },
   });
 
-  const fileTemplate = fs.readFileSync(
-    `src/templates/email/${data.template}`,
-    "utf8"
+  const filePath = path.join(
+    __dirname,
+    `../../src/templates/email/${data.template}`
   );
 
+  const fileTemplate = fs.readFileSync(filePath, "utf8");
+
   const mailOptions = {
-    from: '"Event Organizing" <vitoristo1@gmail.com>',
+    from: '"Event Organizing" <arkawebdev1@gmail.com>',
     to: data.to,
     subject: data.subject,
     html: mustache.render(fileTemplate, { ...data }),
   };
-  transporter.sendMail(mailOptions);
+
+  await transporter.sendMail(mailOptions);
 };
 
 module.exports = { sendMail };
