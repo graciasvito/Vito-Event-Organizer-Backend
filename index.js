@@ -8,7 +8,7 @@ const xss = require("xss-clean");
 const compression = require("compression");
 const bodyParser = require("body-parser");
 
-const admin = require("firebase-admin");
+// const admin = require("firebase-admin");
 const routerNavigation = require("./src/routes"); // ./routes/index.js
 
 const app = express();
@@ -36,11 +36,11 @@ app.listen(port, () => {
   console.log(`Server is Running on port ${port}`);
 });
 
-const serviceAccount = require("./vito-event-organizing-firebase-adminsdk-qww8v-03f787792a.json");
+// const serviceAccount = require("./vito-event-organizing-firebase-adminsdk-qww8v-03f787792a.json");
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
+// admin.initializeApp({
+//   credential: admin.credential.cert(serviceAccount),
+// });
 
 // app.post("/payment", (req, res) => {
 //   const dataUser = {
